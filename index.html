@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resolv — The Intelligence Layer for Prediction Markets</title>
+<meta name="description" content="Resolv aggregates Kalshi and Polymarket, prices every contract against live news with a calibrated model, and shows what to trade, why, and how much to risk.">
+<meta name="theme-color" content="#07090b">
+<link rel="canonical" href="https://resolv.trade/">
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Resolv">
+<meta property="og:title" content="Resolv — The Intelligence Layer for Prediction Markets">
+<meta property="og:description" content="Aggregate Kalshi and Polymarket. Price every contract against live news with an explainable, calibrated model. Know what to trade, why, and how much to risk.">
+<meta property="og:url" content="https://resolv.trade/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Resolv — The Intelligence Layer for Prediction Markets">
+<meta name="twitter:description" content="Explainable fair value for prediction markets. Every signal shows its work.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307090b'/%3E%3Ccircle cx='11' cy='12' r='4' fill='%23bd8a10'/%3E%3Ccircle cx='22' cy='20' r='3' fill='%234db5ff'/%3E%3Cpath d='M11 12 L22 20' stroke='%23e05a6d' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<!-- Marks that JS is running so scroll-reveal can hide sections safely.
+     Must stay inline and in <head>: an external file would load too late. -->
+<script>document.documentElement.className+=" js";</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="bg-layer" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<nav class="nav" id="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Resolv home">
+      <span class="logo">resolv<span class="logo-dot"></span></span>
+    </a>
+    <div class="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#model">The model</a>
+      <a href="#modes">Basic &amp; Pro</a>
+      <a href="#live">Live data</a>
+      <a href="#pricing">Pricing</a>
+      <a class="btn primary sm" href="#access">Request access</a>
+    </div>
+    <button class="navtoggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+  </div>
+</nav>
+<div class="mobilemenu" id="mobileMenu">
+  <a href="#how">How it works</a>
+  <a href="#model">The model</a>
+  <a href="#modes">Basic &amp; Pro</a>
+  <a href="#live">Live data</a>
+  <a href="#pricing">Pricing</a>
+  <a class="btn primary" href="#access">Request access</a>
+</div>
+
+<main id="main">
+<span id="top"></span>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Kalshi · Polymarket · Live news</p>
+      <h1>The intelligence layer for <em>prediction markets.</em></h1>
+      <p class="lede">Event contracts reprice the moment news breaks — and the edge is gone minutes later. Resolv watches the wire across Kalshi and Polymarket, reprices every affected contract in real time, and tells you what to trade, why, and how much to risk.</p>
+      <div class="btn-row">
+        <a class="btn primary" href="#access">Request early access</a>
+        <a class="btn" href="#how">See how it works</a>
+      </div>
+      <p class="hero-note">
+        <span class="tick-badge"><span class="pulse"></span>PRIVATE BETA</span>
+        <span class="live-pill" id="heroLive"><span class="sd loading" style="width:7px;height:7px;border-radius:50%;background:var(--accent)"></span>NEWS WIRE · CONNECTING</span>
+      </p>
+    </div>
+
+    <div class="tprev" id="tprev" aria-label="Illustration of the Resolv pricing pipeline">
+      <div class="tprev-bar">
+        <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
+        <span class="ttl">RESOLV · PRICING PIPELINE</span>
+        <span class="badge-sample">SAMPLE</span>
+      </div>
+      <div class="tprev-body">
+        <div class="tp-market" id="tpMarket">—</div>
+        <div class="tp-sub" id="tpSub"></div>
+        <div class="tp-steps" id="tpSteps"></div>
+        <div class="tp-out">
+          <div class="tp-cell"><span>Market</span><b id="tpMkt">—</b></div>
+          <div class="tp-cell"><span>Resolv fair value</span><b id="tpFair" class="accent">—</b></div>
+          <div class="tp-cell"><span>Verdict</span><b><span class="verdict-tag hold" id="tpVerdict">—</span></b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF STRIP ============ -->
+<section class="strip">
+  <div class="wrap strip-grid">
+    <div class="strip-item"><b class="accent">2 venues</b><span>Kalshi and Polymarket normalized into one contract book</span></div>
+    <div class="strip-item"><b class="up">Continuous</b><span>News wire polled on a loop; affected contracts repriced every cycle</span></div>
+    <div class="strip-item"><b>N(d₂)</b><span>Black-Scholes digital pricing where an underlying exists</span></div>
+    <div class="strip-item"><b class="warn">0 black boxes</b><span>Every claim in a brief cites the evidence behind it</span></div>
+  </div>
+</section>
+
+<!-- ============ WHY NOW ============ -->
+<section class="band" id="why">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">Why now</p>
+      <h2 class="h2">Prediction markets became an asset class. The tooling didn't follow.</h2>
+      <p class="lede">Regulated event exchanges went from curiosity to serious volume — macro, rates, elections, and crypto contracts now trade alongside traditional risk. But the people trading them still work out of a dozen browser tabs, a news feed, and instinct. Every other asset class got a terminal. This one hasn't.</p>
+    </div>
+    <div class="cards3">
+      <div class="card rv">
+        <div class="ico">◎</div>
+        <h3>Fragmented discovery</h3>
+        <p>The same question trades on two venues at two prices, under two sets of resolution criteria. Nobody is reconciling them in real time.</p>
+      </div>
+      <div class="card rv">
+        <div class="ico">⚖︎</div>
+        <h3>Unpriced information</h3>
+        <p>News moves these contracts faster than equities, but there's no layer mapping a headline to the specific contracts it should reprice.</p>
+      </div>
+      <div class="card rv">
+        <div class="ico">◈</div>
+        <h3>No risk discipline</h3>
+        <p>Position sizing is guesswork, and resolution ambiguity — the risk of being right and still not paid — goes almost entirely unmodeled.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="band" id="how">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">How it works</p>
+      <h2 class="h2">From headline to sized position, in one pass.</h2>
+      <p class="lede">Five deterministic stages. Click any one to see what happens inside it — the same pipeline runs on every refresh.</p>
+    </div>
+    <div class="pipe rv" id="pipeTabs" role="tablist" aria-label="Pipeline stages"></div>
+    <div class="pipe-detail rv" id="pipeDetail" role="tabpanel" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ============ EVIDENCE GRAPH ============ -->
+<section class="band" id="graph">
+  <div class="wrap">
+    <div class="graph-split">
+      <div class="rv">
+        <p class="eyebrow">Evidence graph</p>
+        <h2 class="h2">Retrieval you can actually see.</h2>
+        <p class="lede">Most AI tools retrieve context invisibly and ask you to trust the summary. Resolv makes the corpus a typed graph — markets, headlines, and entities joined by explicit links — so retrieval is a traversal you can inspect, and a claim without an edge behind it can't be written.</p>
+        <div class="feature-list">
+          <div class="fl-item"><span class="fi">01</span><div><b>Typed edges, not embeddings</b><p>Evidence links join headlines to the contracts they bear on. Cross-venue links pair the same question across exchanges. Topic links group by entity.</p></div></div>
+          <div class="fl-item"><span class="fi">02</span><div><b>Every sentence is citable</b><p>Each claim in a generated brief carries a footnote that resolves to a node in the graph. Click it and the source is highlighted.</p></div></div>
+          <div class="fl-item"><span class="fi">03</span><div><b>Filter the graph, move the price</b><p>Hide stale news and fair values recompute — because the visible graph literally is the model's input, not a picture of it.</p></div></div>
+        </div>
+      </div>
+      <div class="graph-frame rv">
+        <canvas id="miniGraph" aria-label="Animated illustration of an evidence graph connecting markets, headlines, and entities"></canvas>
+        <div class="graph-legend" aria-hidden="true">
+          <div class="lg-row"><span class="lg-dot" style="background:var(--market)"></span>market</div>
+          <div class="lg-row"><span class="lg-dot" style="background:var(--news)"></span>headline</div>
+          <div class="lg-row"><span class="lg-line" style="border-color:#e05a6d"></span>evidence link</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE MODEL ============ -->
+<section class="band" id="model">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">The model</p>
+      <h2 class="h2">Two model families. One auditable verdict.</h2>
+      <p class="lede">Event contracts are binary options, so Resolv uses the right instrument for each — not one formula stretched over everything it doesn't fit.</p>
+    </div>
+    <div class="math-grid">
+      <div class="math-card rv">
+        <div class="math-head"><b>Threshold markets</b><span class="tag">TRADABLE UNDERLYING</span></div>
+        <div class="math-body">
+          <div class="formula">P(S<sub>T</sub> &gt; K) = N(<span class="v">d₂</span>)<br>d₂ = [ln(S/K) + (μ − σ²/2)T] / σ√T</div>
+          <p>"Bitcoin above $120K on August 1" has a spot, a strike, and an expiry — so it is priced with the Black-Scholes digital-option formula. N(d₂) <em>is</em> the event probability, driven by distance to strike, volatility, and time remaining.</p>
+        </div>
+      </div>
+      <div class="math-card rv">
+        <div class="math-head"><b>Event markets</b><span class="tag">NO UNDERLYING</span></div>
+        <div class="math-body">
+          <div class="formula">logit(p̂) = <span class="v">a</span> + <span class="v">b</span>·logit(p<sub>mkt</sub>) + <span class="v">k</span>·evidence</div>
+          <p>"Will the Fed cut in July" has nothing to hedge against, so Black-Scholes is the wrong tool. Resolv starts from the de-biased market price as a prior and updates it with evidence in log-odds space — where every factor is one additive term.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards2 rv" style="margin-top:16px">
+      <div class="math-card">
+        <div class="math-head"><b>Attribution is exact, not approximate</b><span class="tag">SAMPLE DECOMPOSITION</span></div>
+        <div class="math-body">
+          <div class="attrib">
+            <div class="attrib-row head"><span>Factor</span><span>Contribution</span><span class="val">Δ pts</span></div>
+            <div class="attrib-row"><span>Exchange anchor</span><span class="bar"><i style="left:50%;width:0"></i></span><span class="val dim">58.0¢</span></div>
+            <div class="attrib-row"><span>Longshot de-bias</span><span class="bar"><i style="left:50%;width:6%;background:var(--up)"></i></span><span class="val up">+0.5</span></div>
+            <div class="attrib-row"><span>News evidence</span><span class="bar"><i style="left:50%;width:34%;background:var(--up)"></i></span><span class="val up">+5.6</span></div>
+            <div class="attrib-row"><span>Cross-venue pull</span><span class="bar"><i style="left:44%;width:6%;background:var(--down)"></i></span><span class="val down">−0.4</span></div>
+            <div class="attrib-row"><span>Ambiguity shrink</span><span class="bar"><i style="left:41%;width:9%;background:var(--down)"></i></span><span class="val down">−0.6</span></div>
+            <div class="attrib-row" style="background:var(--s2)"><span><b style="color:var(--text)">Fair value</b></span><span></span><span class="val accent">63.1¢</span></div>
+          </div>
+          <p style="margin-top:14px;font-size:13.5px">Because the pipeline is additive in log-odds, the factors provably sum to the answer. No "the model says so."</p>
+        </div>
+      </div>
+      <div class="math-card">
+        <div class="math-head"><b>Calibrated against outcomes</b><span class="tag">TRAINED, NOT TUNED</span></div>
+        <div class="math-body">
+          <p style="margin-bottom:16px">A forecast is only as good as its calibration. Resolv fits the model's parameters to resolved contract history by gradient descent, then reports honest scoring rules on held-out data — log loss, Brier score, and a reliability curve showing whether 70% forecasts actually happen 70% of the time.</p>
+          <div class="attrib">
+            <div class="attrib-row head"><span>Held-out metric</span><span>Baseline</span><span class="val">Fitted</span></div>
+            <div class="attrib-row"><span>Log loss</span><span class="mono dim" style="font-size:12.5px">0.5548</span><span class="val up">0.5536</span></div>
+            <div class="attrib-row"><span>Brier score</span><span class="mono dim" style="font-size:12.5px">0.1898</span><span class="val up">0.1878</span></div>
+            <div class="attrib-row"><span>Reliability</span><span class="mono dim" style="font-size:12.5px">curve</span><span class="val accent">tracked</span></div>
+          </div>
+          <p style="margin-top:14px;font-size:13px;color:var(--faint)">Figures from the current model-lab validation run. Calibration is refit as real resolved history accumulates.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card rv" style="margin-top:16px;border-left:3px solid var(--warn)">
+      <h3>When the evidence isn't enough, Resolv says so</h3>
+      <p style="max-width:820px">A verdict only fires when the edge clears a threshold <em>and</em> confidence clears a floor. Otherwise the output is HOLD with a machine-readable reason — insufficient edge, low confidence, or no mapped evidence. A tool that always has an opinion isn't a model, it's a slot machine.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESOLUTION RISK ============ -->
+<section class="band" id="risk">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">Resolution risk</p>
+      <h2 class="h2">Right thesis. Wrong payout.</h2>
+      <p class="lede">Event contracts don't settle on what happened — they settle on what the resolution criteria say happened. Vague criteria are a real, priceable risk, and almost nothing else models it.</p>
+    </div>
+    <div class="cards3">
+      <div class="card rv"><div class="ico">⌗</div><h3>Criteria are scored</h3><p>Resolution text is scanned for discretionary language, undefined terms, and missing authoritative sources. Every contract carries an ambiguity score.</p></div>
+      <div class="card rv"><div class="ico">↘</div><h3>Ambiguity shrinks the estimate</h3><p>High ambiguity pulls fair value toward 50¢ and caps confidence — visible as its own line in the attribution, never hidden in a fudge factor.</p></div>
+      <div class="card rv"><div class="ico">⚑</div><h3>Flagged before you size</h3><p>Contracts whose payout could contradict a correct thesis are surfaced in the risk panel before position sizing, not after settlement.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODES ============ -->
+<section class="band" id="modes">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">Two interfaces, one model</p>
+      <h2 class="h2">Simple for traders. Deep for desks.</h2>
+      <p class="lede">Most tools either hide too much or drown you. Resolv splits the surface by intent — the same fair value underneath.</p>
+    </div>
+    <div class="rv">
+      <div class="modes-toggle" role="group" aria-label="Select mode">
+        <button id="mBasic" aria-pressed="true">Basic</button>
+        <button id="mPro" aria-pressed="false">Pro</button>
+      </div>
+      <div class="modes-panel">
+        <div class="modes-head">
+          <b id="modeTitle">Basic — the decision, not the dashboard</b>
+          <span id="modeFor">FOR EVERYDAY TRADERS</span>
+        </div>
+        <div class="modes-rows" id="modeRows"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REAL TIME ============ -->
+<section class="band" id="live">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">Real-time intelligence</p>
+      <h2 class="h2">In event markets, the information <em style="font-style:normal;color:var(--accent)">is</em> the edge — and it decays in minutes.</h2>
+      <p class="lede">Equities absorb news gradually across a continuous price. Event contracts don't: a single headline can permanently move a contract from 44¢ to 61¢, and the gap between the wire hitting and the book catching up is the entire opportunity. Miss the window and you're trading a price that already knows.</p>
+    </div>
+
+    <div class="speed-grid rv">
+      <div class="decay-frame">
+        <span class="decay-cap">How a mispricing closes</span>
+        <span class="decay-tag">ILLUSTRATIVE</span>
+        <canvas id="decayChart" aria-label="Illustration showing the gap between market price and fair value closing in the minutes after news breaks"></canvas>
+      </div>
+      <div class="facts">
+        <div class="fact">
+          <b class="accent">Seconds</b>
+          <span>From wire to mapped contract. Headlines are matched to affected markets the moment they land — no manual triage.</span>
+        </div>
+        <div class="fact">
+          <b class="up">Every cycle</b>
+          <span>Fair value, confidence, and verdict are recomputed on each refresh, so a stale read never sits on screen.</span>
+        </div>
+        <div class="fact">
+          <b class="warn">Before it closes</b>
+          <span>Alerts fire on threshold breaks while the window is still open — not in a morning digest after the repricing.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="live-grid">
+      <div class="feed rv">
+        <div class="feed-head">
+          <b>The wire, live in your browser</b>
+          <div class="feed-controls">
+            <span class="countdown" id="feedCountdown"></span>
+            <span class="status" id="feedStatus"><span class="sd loading"></span>CONNECTING</span>
+            <button class="refresh-btn" id="feedRefresh" aria-label="Refresh news feed" title="Refresh now">↻</button>
+          </div>
+        </div>
+        <div class="feed-rows" id="feedRows">
+          <div class="feed-empty">Fetching the public news feed…</div>
+        </div>
+      </div>
+      <div class="honesty rv">
+        <h3>Five states, never faked</h3>
+        <p>Speed is worthless if you can't trust it. Every source reports its own health, so you always know whether a number is live, cached, or missing.</p>
+        <div class="state-list">
+          <div class="state-item"><span class="sd" style="width:8px;height:8px;border-radius:50%;background:var(--accent)"></span>LOADING — request in flight</div>
+          <div class="state-item"><span class="sd" style="width:8px;height:8px;border-radius:50%;background:var(--up)"></span>LIVE — fresh from the source</div>
+          <div class="state-item"><span class="sd" style="width:8px;height:8px;border-radius:50%;background:var(--warn)"></span>SNAPSHOT — labeled, timestamped sample</div>
+          <div class="state-item"><span class="sd" style="width:8px;height:8px;border-radius:50%;background:var(--warn)"></span>RATE-LIMITED — backing off</div>
+          <div class="state-item"><span class="sd" style="width:8px;height:8px;border-radius:50%;background:var(--down)"></span>UNAVAILABLE — shown, not hidden</div>
+        </div>
+        <p style="margin-top:16px;margin-bottom:0;font-size:13px;color:var(--faint)">A stale number presented as fresh is the most expensive bug a trading tool can have. Timestamps tick live on every row above.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="band" id="pricing">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">Packaging</p>
+      <h2 class="h2">Start with signal. Grow into infrastructure.</h2>
+      <p class="lede">Private beta pricing. Early access seats include the full Pro surface while we calibrate against live history.</p>
+    </div>
+    <div class="cards3">
+      <div class="price-card rv">
+        <h3>Basic</h3>
+        <p class="who">Everyday traders</p>
+        <div class="amt">$20<small>/mo</small></div>
+        <ul>
+          <li><span class="ck">✓</span>Cross-venue market discovery</li>
+          <li><span class="ck">✓</span>Plain-English verdict and confidence</li>
+          <li><span class="ck">✓</span>Live news mapped to your markets</li>
+          <li><span class="ck">✓</span>Suggested maximum risk</li>
+          <li><span class="ck">✓</span>Watchlist and price alerts</li>
+        </ul>
+        <a class="btn" href="#access">Request access</a>
+      </div>
+      <div class="price-card feat rv">
+        <h3>Pro</h3>
+        <p class="who">Analysts and professional traders</p>
+        <div class="amt">$99<small>/mo</small></div>
+        <ul>
+          <li><span class="ck">✓</span>Everything in Basic</li>
+          <li><span class="ck">✓</span>Full factor attribution and reasoning surface</li>
+          <li><span class="ck">✓</span>Evidence graph explorer</li>
+          <li><span class="ck">✓</span>Cross-venue arbitrage scanner with fee math</li>
+          <li><span class="ck">✓</span>Portfolio exposure and VaR-style risk</li>
+          <li><span class="ck">✓</span>Monte Carlo and Kelly sizing tools</li>
+          <li><span class="ck">✓</span>Session export for audit</li>
+        </ul>
+        <a class="btn primary" href="#access">Request access</a>
+      </div>
+      <div class="price-card rv">
+        <h3>Institution</h3>
+        <p class="who">Desks and funds</p>
+        <div class="amt">Custom</div>
+        <ul>
+          <li><span class="ck">✓</span>Everything in Pro</li>
+          <li><span class="ck">✓</span>Pricing-engine API access</li>
+          <li><span class="ck">✓</span>Team seats and entitlements</li>
+          <li><span class="ck">✓</span>Compliance logs and audit trail</li>
+          <li><span class="ck">✓</span>Custom alerting and data feeds</li>
+        </ul>
+        <a class="btn" href="#access">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="band" id="faq">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="eyebrow">FAQ</p>
+      <h2 class="h2">What Resolv is, and what it isn't.</h2>
+    </div>
+    <div class="faq rv">
+      <details open><summary>Is Resolv an exchange?</summary><div class="fa">No. Resolv is an analytics and decision terminal. It reads public market data and helps you price and size positions. It does not route orders, custody funds, or act as a broker — you trade on Kalshi, Polymarket, or wherever you already have an account.</div></details>
+      <details><summary>Where does the data come from?</summary><div class="fa">Public market APIs from the exchanges themselves, plus public news feeds. Every figure in the product carries its source and a timestamp. When a source is unreachable, the interface reports it rather than substituting invented data.</div></details>
+      <details><summary>Are the model estimates predictions?</summary><div class="fa">They're analytical outputs computed from documented factors — exchange price, mapped news sentiment, liquidity, time to expiry, cross-venue disagreement, and resolution ambiguity. They are probability estimates with stated confidence, not guarantees, and not financial advice.</div></details>
+      <details><summary>Why should I trust a model I can't see?</summary><div class="fa">You can see it. Every fair value decomposes into named, additive factors that sum exactly to the result, every claim in a brief cites its source, and calibration is scored on held-out outcomes with public scoring rules. If a number can't be traced, it doesn't ship.</div></details>
+      <details><summary>What happens in the private beta?</summary><div class="fa">Early access seats get the full Pro surface. In exchange we're calibrating the model against live resolved contracts and want direct feedback on where the pricing disagrees with your read of a market.</div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="band" id="access" style="border-top:0">
+  <div class="wrap">
+    <div class="cta rv">
+      <h2>Get early access to Resolv.</h2>
+      <p>We're onboarding a small group of traders and desks during calibration. Leave your email and we'll be in touch with a seat.</p>
+      <form class="wait-form" id="waitForm" novalidate>
+        <input type="email" id="waitEmail" placeholder="you@firm.com" aria-label="Email address" autocomplete="email" required>
+        <button class="btn primary" type="submit" id="waitBtn">Request access</button>
+      </form>
+      <div class="wait-msg" id="waitMsg" role="status" aria-live="polite"></div>
+      <p class="cta-fine">No spam, no list-selling. We'll only email you about beta access.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <span class="logo">resolv<span class="logo-dot"></span></span>
+        <p>The intelligence and decision layer for prediction markets. Explainable fair value, cited evidence, and risk discipline for an asset class that finally deserves a terminal.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <a href="#how">How it works</a>
+        <a href="#model">The model</a>
+        <a href="#modes">Basic &amp; Pro</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="#access">Request access</a>
+        <a href="#faq">FAQ</a>
+        <a href="mailto:hello@resolv.trade" id="footMail">Contact</a>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <p><strong style="color:var(--muted)">Not financial advice.</strong> Resolv produces analytical probability estimates from public data and documented models. They are not guarantees of outcome, not investment recommendations, and not a solicitation to trade. Event contracts carry risk of total loss. Market data belongs to the respective exchanges.</p>
+      <p>&copy; <span id="year">2026</span> Resolv</p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
