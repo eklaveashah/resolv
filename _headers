@@ -1,0 +1,19 @@
+# Security headers for Netlify / Cloudflare Pages (picked up automatically).
+# Other hosts: copy these into your server config (nginx add_header, Apache
+# Header set, or vercel.json "headers"). The CSP here mirrors the <meta> tag
+# in both HTML files; real headers are stronger because they also support
+# frame-ancestors, and they cover every response the host serves.
+#
+# If you set WAITLIST_ENDPOINT in script.js, add its origin to connect-src
+# below AND in the <meta> CSP in index.html + methodology.html.
+
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'sha256-tHd4qJ0R/vQfI0CbRTiL3XGSi+Tun7VhOcDbx08aLKA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.gdeltproject.org; base-uri 'none'; form-action 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none

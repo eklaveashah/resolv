@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Security: CSP mirrors Website/_headers (real headers win where supported).
+     If you set WAITLIST_ENDPOINT in script.js, add its origin to connect-src
+     here AND in _headers, or the browser will block the signup POST. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-tHd4qJ0R/vQfI0CbRTiL3XGSi+Tun7VhOcDbx08aLKA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.gdeltproject.org; base-uri 'none'; form-action 'self'; object-src 'none'; frame-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>How Resolv Works · Methodology</title>
+<meta name="description" content="How Resolv prices event contracts: the five-stage pipeline, the two model families, how evidence is mapped, and how we score our own calibration.">
+<meta name="theme-color" content="#07090b">
+<link rel="canonical" href="https://resolv.trade/methodology.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resolv">
+<meta property="og:title" content="How Resolv Works · Methodology">
+<meta property="og:description" content="The five-stage pipeline, the two model families, and how we score our own forecasts.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How Resolv Works · Methodology">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307090b'/%3E%3Ccircle cx='11' cy='12' r='4' fill='%23bd8a10'/%3E%3Ccircle cx='22' cy='20' r='3' fill='%234db5ff'/%3E%3Cpath d='M11 12 L22 20' stroke='%23e05a6d' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>document.documentElement.className+=" js";</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="bg-layer" aria-hidden="true"></div>
+<div class="bg-aurora" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav stuck" id="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Resolv home"><span class="logo">resolv<span class="logo-dot"></span></span></a>
+    <div class="navlinks">
+      <a href="index.html#what">What it does</a>
+      <a href="index.html#proof">Proof</a>
+      <a href="index.html#live">Live data</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="methodology.html" aria-current="page">Methodology</a>
+      <a class="btn primary sm" href="index.html#access">Start free</a>
+    </div>
+    <button class="navtoggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+  </div>
+</nav>
+<div class="mobilemenu" id="mobileMenu">
+  <a href="index.html#what">What it does</a><a href="index.html#proof">Proof</a>
+  <a href="index.html#live">Live data</a><a href="index.html#pricing">Pricing</a>
+  <a class="btn primary" href="index.html#access">Start free</a>
+</div>
+
+<main id="main">
+
+<!-- ══════════ DOC HERO ══════════ -->
+<header class="doc-hero">
+  <div class="wrap">
+    <a class="back-link" href="index.html">← Back to Resolv</a>
+    <p class="eyebrow">Methodology</p>
+    <h1 class="statement">How Resolv prices<br>an event contract.</h1>
+    <p class="lede">The short version is on the <a href="index.html#what">main page</a>. This is the long version: what goes in, what the model does with it, when it refuses to answer, and how we check ourselves.</p>
+    <div class="doc-toc">
+      <a href="#pipeline">The pipeline</a>
+      <a href="#models">The two models</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#risk">Resolution risk</a>
+      <a href="#calibration">Calibration</a>
+      <a href="#faq">FAQ</a>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════ PIPELINE ══════════ -->
+<section class="band" id="pipeline">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">The pipeline</p>
+      <h2 class="statement sm">From headline to sized position,<br>in one pass.</h2>
+      <p class="lede">Five deterministic stages. Click any one to look inside; the same pipeline runs on every refresh.</p>
+    </div>
+    <div class="rail rv" id="rail" role="tablist" aria-label="Pipeline stages"></div>
+    <div class="stage-view rv">
+      <div class="stage-detail">
+        <p class="stage-num" id="stageNum">01 · INGEST</p>
+        <h3 class="stage-title" id="stageTitle">Aggregate</h3>
+        <p class="stage-body" id="stageBody"></p>
+        <p class="stage-guarantee" id="stageGuarantee"></p>
+      </div>
+      <div class="stage-panel" id="stagePanel"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ MODELS ══════════ -->
+<section class="band" id="models">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">The two models</p>
+      <h2 class="statement sm">Different questions need<br>different maths.</h2>
+      <p class="lede">Some contracts have something you can actually track: a price, a level, a date. Others don't. Using one formula for both would be wrong, so we don't.</p>
+    </div>
+    <div class="math-grid">
+      <div class="math-card rv">
+        <div class="math-head"><b>Markets with a number to track</b><span class="tag">e.g. “BTC above $120K”</span></div>
+        <div class="math-body">
+          <p style="margin-bottom:16px">There's a live price, a target, and a deadline. That's the same shape as an option, so we price it like one: how far away the target is, how much the thing moves, and how much time is left.</p>
+          <div class="formula">P(S<sub>T</sub> &gt; K) = N(<span class="v">d₂</span>)<br>d₂ = [ln(S/K) + (μ − σ²/2)T] / σ√T</div>
+          <p class="micro">The Black-Scholes digital formula. N(d₂) is the probability the target is cleared by the deadline.</p>
+        </div>
+      </div>
+      <div class="math-card rv">
+        <div class="math-head"><b>Markets with nothing to track</b><span class="tag">e.g. “Fed cuts in July”</span></div>
+        <div class="math-body">
+          <p style="margin-bottom:16px">There's no price feed for a committee decision. So we start from what the market already believes, and move it only as far as new evidence justifies, the way a forecaster updates a view.</p>
+          <div class="formula">logit(p̂) = <span class="v">a</span> + <span class="v">b</span>·logit(p<sub>mkt</sub>) + <span class="v">k</span>·evidence</div>
+          <p class="micro">Working in log-odds keeps every factor additive, so the pieces sum exactly to the answer.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="math-grid" style="margin-top:16px">
+      <div class="math-card rv">
+        <div class="math-head"><b>Every price adds up</b><span class="tag">EXAMPLE</span></div>
+        <div class="math-body">
+          <div class="attrib">
+            <div class="attrib-row head"><span>What moved it</span><span></span><span class="val">Change</span></div>
+            <div class="attrib-row"><span>Exchange price</span><span class="bar"></span><span class="val dim">58.0¢</span></div>
+            <div class="attrib-row"><span>Crowd bias correction</span><span class="bar"><i style="left:50%;width:6%;background:var(--up)"></i></span><span class="val up">+0.5</span></div>
+            <div class="attrib-row"><span>News</span><span class="bar"><i style="left:50%;width:34%;background:var(--up)"></i></span><span class="val up">+5.6</span></div>
+            <div class="attrib-row"><span>Other exchange disagrees</span><span class="bar"><i style="left:44%;width:6%;background:var(--down)"></i></span><span class="val down">−0.4</span></div>
+            <div class="attrib-row"><span>Vague rules discount</span><span class="bar"><i style="left:41%;width:9%;background:var(--down)"></i></span><span class="val down">−0.6</span></div>
+            <div class="attrib-row total"><span><b>What we think it's worth</b></span><span></span><span class="val accent">63.1¢</span></div>
+          </div>
+          <p class="micro">No unexplained residual. If a number can't be traced to a line in this table, it doesn't ship.</p>
+        </div>
+      </div>
+      <div class="math-card rv">
+        <div class="math-head"><b>When we refuse to answer</b><span class="tag">THE GATE</span></div>
+        <div class="math-body">
+          <p style="margin-bottom:18px">A call only fires when the gap is big enough <em>and</em> we're confident enough. Otherwise the answer is "sit this one out", with the reason attached.</p>
+          <div class="attrib">
+            <div class="attrib-row head"><span>Check</span><span>Needs</span><span class="val">This market</span></div>
+            <div class="attrib-row"><span>Size of the gap</span><span class="mono dim sml">≥ 4 pts</span><span class="val up">+5.1 ✓</span></div>
+            <div class="attrib-row"><span>Confidence</span><span class="mono dim sml">≥ 50%</span><span class="val up">73% ✓</span></div>
+            <div class="attrib-row"><span>Evidence found</span><span class="mono dim sml">≥ 1 source</span><span class="val up">3 ✓</span></div>
+          </div>
+          <p class="micro">Most contracts, most of the time, are priced about right. A tool that always has an opinion isn't a model.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SCENE · EVIDENCE GRAPH ══════════ -->
+<section class="scene" id="evidence" data-scene="graph">
+  <div class="scene-inner">
+    <div class="scene-stage wide">
+      <canvas id="graphCanvas" aria-label="An evidence graph assembling: headlines connecting to the contracts they affect"></canvas>
+    </div>
+    <div class="scene-copy">
+      <p class="beat" data-beat="0">Every price cites <em>its evidence.</em></p>
+      <p class="beat" data-beat="1">Headlines link to the contracts they move.</p>
+      <p class="beat" data-beat="2">No black box. <em>Ever.</em></p>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap narrow">
+    <div class="prose rv">
+      <h2 class="statement sm">How a headline reaches a price</h2>
+      <p>News is matched to contracts by the words and entities they share, not by a language model guessing at relevance. That keeps it reproducible: the same headline and the same contract always produce the same link.</p>
+      <p>Each linked headline becomes a small nudge, weighted by how relevant it is, how credible the source is, and how recent it is. Older news fades. The total nudge is capped, so twenty versions of the same story can't run a price away.</p>
+      <p>If nothing links to a market, it gets <em>no</em> news adjustment, not a guessed one. Staying near the exchange price is the honest default when there's no evidence.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ RESOLUTION RISK ══════════ -->
+<section class="band" id="risk">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">Resolution risk</p>
+      <h2 class="statement sm">Right call. Wrong payout.</h2>
+      <p class="lede">Contracts settle on their written rules, not on what everyone agrees happened. When those rules are vague, you can be correct and still not get paid, so we price that risk instead of ignoring it.</p>
+    </div>
+    <div class="cards3">
+      <div class="card rv"><div class="ico">⌗</div><h3>We read the rules</h3><p>Resolution text is scanned for weasel words, undefined terms and missing sources of truth. Each market gets a vagueness score.</p></div>
+      <div class="card rv"><div class="ico">↘</div><h3>Vague rules pull toward 50/50</h3><p>The vaguer the rules, the closer we push our estimate to a coin flip, and the lower our stated confidence.</p></div>
+      <div class="card rv"><div class="ico">⚑</div><h3>Flagged before you size</h3><p>Markets where the payout could contradict a correct call are surfaced before you decide how much to risk, not after settlement.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CALIBRATION ══════════ -->
+<section class="band" id="calibration">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">Calibration</p>
+      <h2 class="statement sm">How we check ourselves.</h2>
+      <p class="lede">A forecast that says 70% should be right about 70% of the time. That's a measurable claim, so we measure it, on data the model has never seen.</p>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-chart rv">
+        <div class="pc-head">
+          <b>Forecast vs what actually happened</b>
+          <span class="badge-sample">VALIDATION RUN</span>
+        </div>
+        <canvas id="calChart" aria-label="Chart comparing forecast probability to observed frequency"></canvas>
+        <p class="pc-note">Each dot groups forecasts of similar confidence. On the line means well calibrated; above means we were too cautious, below means too bold.</p>
+      </div>
+      <div class="prose rv">
+        <h3 class="h3">What the scores mean</h3>
+        <p><b>Log loss</b> punishes confident mistakes hardest. Lower is better. A model that hedges everything at 50% scores about 0.69; we need to beat that to be worth anything.</p>
+        <p><b>Brier score</b> is the average squared miss between forecast and outcome. Also lower-is-better, and easier to read: 0.25 is a coin flip.</p>
+        <div class="attrib" style="margin-top:20px">
+          <div class="attrib-row head"><span>Held-out metric</span><span>Baseline</span><span class="val">Fitted</span></div>
+          <div class="attrib-row"><span>Log loss</span><span class="mono dim sml">0.5548</span><span class="val up">0.5536</span></div>
+          <div class="attrib-row"><span>Brier score</span><span class="mono dim sml">0.1898</span><span class="val up">0.1878</span></div>
+        </div>
+        <p class="micro">From the current validation run on sample history. These get refit, and republished, as real resolved contracts accumulate. We'd rather show a modest honest number than a flattering one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FAQ ══════════ -->
+<section class="band" id="faq">
+  <div class="wrap narrow">
+    <div class="section-head rv">
+      <p class="kicker">FAQ</p>
+      <h2 class="statement sm">Straight answers.</h2>
+    </div>
+    <div class="faq rv">
+      <details open><summary>Is Resolv an exchange?</summary><div class="fa">No. We don't take your money or place your trades. You keep trading wherever you already have an account; Resolv is the analysis you do before you click.</div></details>
+      <details><summary>Where does the data come from?</summary><div class="fa">Public feeds from the exchanges themselves, plus public news. Every figure carries its source and a timestamp. When something's unreachable, the page says so rather than quietly showing you a stale number.</div></details>
+      <details><summary>Are these predictions?</summary><div class="fa">They're estimates with stated confidence, built from things we can point at: the exchange price, the news, how liquid the market is, how long is left, whether the two exchanges disagree, and how clear the rules are. Not guarantees, and not financial advice.</div></details>
+      <details><summary>Why should I trust a model I can't see?</summary><div class="fa">You can see it. Every price breaks into named parts that add up exactly to the result, every claim links to its source, and we score ourselves on data the model never trained on. If a number can't be traced, it doesn't ship.</div></details>
+      <details><summary>What happens after the free trial?</summary><div class="fa">You pick a plan or you don't; nothing charges automatically, because we don't take a card to start. If you stop, your watchlist and settings stay put in case you come back.</div></details>
+    </div>
+    <div class="doc-cta rv">
+      <h3>That's the whole method.</h3>
+      <p>Try it against live markets for 14 days.</p>
+      <a class="btn primary lg" href="index.html#access">Start free</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div class="foot-brand">
+      <span class="logo">resolv<span class="logo-dot"></span></span>
+      <div class="foot-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#pricing">Pricing</a>
+        <a href="index.html#access">Start free</a>
+      </div>
+    </div>
+    <p class="foot-legal">Resolv is an analytics tool, not a broker or an exchange. Our estimates come from public data and published models; they are not guarantees and not financial advice. Event contracts can lose their full value. &copy; <span id="year">2026</span> Resolv</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
