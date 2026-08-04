@@ -11,12 +11,12 @@
 <title>Resolv · The Intelligence Layer for Prediction Markets</title>
 <meta name="description" content="Resolv finds mispriced event contracts across Kalshi and Polymarket, shows you why they're mispriced, and tells you how much to risk. 14 days free.">
 <meta name="theme-color" content="#07090b">
-<link rel="canonical" href="https://resolv.trade/">
+<link rel="canonical" href="https://resolvterminal.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Resolv">
 <meta property="og:title" content="Resolv · The Intelligence Layer for Prediction Markets">
 <meta property="og:description" content="Find mispriced event contracts. See why. Know how much to risk.">
-<meta property="og:url" content="https://resolv.trade/">
+<meta property="og:url" content="https://resolvterminal.com/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Resolv · The Intelligence Layer for Prediction Markets">
 <meta name="twitter:description" content="Find mispriced event contracts. See why. Know how much to risk.">
@@ -110,7 +110,7 @@
 
 <!-- ══════════ TAPE (sample, labeled) ══════════ -->
 <section class="tape" aria-label="Sample market tape, illustrative, not live prices">
-  <div class="tape-label"><span class="badge-sample">SAMPLE</span><span class="tape-note">NOT LIVE PRICES</span></div>
+  <div class="tape-label"><span class="badge-sample" id="tapeBadge">SAMPLE</span><span class="tape-note" id="tapeNote">NOT LIVE PRICES</span></div>
   <div class="tape-clip" aria-hidden="true"><div class="tape-track" id="tapeTrack"></div></div>
 </section>
 
@@ -245,7 +245,7 @@
       <aside class="impact" aria-label="How the selected headline maps to markets" aria-live="polite">
         <div class="impact-head">
           <b>What it touches</b>
-          <span class="badge-sample">SAMPLE MARKETS</span>
+          <span class="badge-sample" id="impactBadge">SAMPLE MARKETS</span>
         </div>
         <div class="impact-body" id="impactBody">
           <div class="imp-standby"><p>This pane lights up when the wire connects. Pick any headline to see how we score it and which contracts it touches.</p></div>

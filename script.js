@@ -16,6 +16,17 @@
 const CONTACT_EMAIL = "hello@resolv.trade";
 const WAITLIST_ENDPOINT = "";   // e.g. "https://formspree.io/f/xxxxxxx"
 
+/* FEED_PROXY - URL of the Resolv feed Worker (see worker/README.md).
+   Leave empty and the page fetches GDELT straight from the visitor's
+   browser, which works but breaks for anyone on a rate-limited or shared
+   IP, and can never reach Kalshi or Polymarket because those calls are
+   blocked by CORS or by our own CSP.
+   Set it to your deployed Worker URL and you get live news AND live market
+   prices, cached once per minute for every visitor at the same time.
+   When you set it, add its origin to connect-src in the CSP: index.html,
+   methodology.html and _headers. */
+const FEED_PROXY = "";   // e.g. "https://resolv-feed.yourname.workers.dev"
+
 /* ---------------- utils ---------------- */
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g,
@@ -46,6 +57,12 @@ const SAMPLE_MARKETS = [
   { v: "POLYMARKET", q: "NASDAQ RECORD BY OCT", p: 44, d: 3, cat: "Stocks" },
   { v: "POLYMARKET", q: "US GDP > 2% IN 2026", p: 58, d: 1, cat: "Economy" }
 ];
+
+/* Filled in only when the feed Worker returns real market prices. Until then
+   it stays empty and every market surface keeps its SAMPLE label. */
+let LIVE_MARKETS = [];
+const marketRows = () => (LIVE_MARKETS.length ? LIVE_MARKETS : SAMPLE_MARKETS);
+const marketsAreLive = () => LIVE_MARKETS.length > 0;
 
 /* hero entrance - class flip so animations start after first paint */
 requestAnimationFrame(() => document.body.classList.add("loaded"));
@@ -560,8 +577,10 @@ document.querySelectorAll("[data-count]").forEach(el => {
     if (!a) return impactStandby();
     const pos = a.tone >= 0;
     const pct = Math.round(((a.tone + 1) / 2) * 100);
-    const rel = SAMPLE_MARKETS.filter(m => m.cat === a.cat).slice(0, 3);
-    const list = rel.length ? rel : SAMPLE_MARKETS.slice(0, 3);
+    const pool = marketRows();
+    const rel = pool.filter(m => m.cat === a.cat).slice(0, 3);
+    const list = rel.length ? rel : pool.slice(0, 3);
+    const live = marketsAreLive();
     host.innerHTML = `
       <p class="imp-title">${esc(a.title)}</p>
       <div class="imp-meta">${esc(a.domain)} · ${esc(timeAgo(a.ts))}</div>
@@ -570,7 +589,9 @@ document.querySelectorAll("[data-count]").forEach(el => {
       <div class="tm-legend"><span>negative</span><b class="${pos ? "up" : "down"}">reads ${pos ? "positive" : "negative"} · ${pos ? "+" : ""}${a.tone.toFixed(2)}</b><span>positive</span></div>
       <div class="imp-label">Contracts this kind of story touches <span class="imp-cat">${esc(a.cat)}</span></div>
       ${list.map(m => `<div class="imp-row"><span class="imp-venue">${esc(m.v)}</span><span class="imp-q">${esc(m.q)}</span><b class="mono">${m.p}¢</b></div>`).join("")}
-      <p class="imp-note">Live headline, sample contracts. In the product this becomes a priced call: fair value, gap, and stake.</p>
+      <p class="imp-note">${live
+        ? "Live headline, live contract prices. In the product this becomes a priced call: fair value, gap, and stake."
+        : "Live headline, sample contracts. In the product this becomes a priced call: fair value, gap, and stake."}</p>
       <a class="btn sm" href="#access">Get the live version</a>`;
     host.classList.remove("flash");
     void host.offsetWidth;   // restart the update flash
@@ -580,21 +601,74 @@ document.querySelectorAll("[data-count]").forEach(el => {
     const host = $("impactBody");
     if (host) host.innerHTML = `<div class="imp-standby"><p>This pane lights up when the wire connects. Pick any headline to see how we score it and which contracts it touches.</p></div>`;
   }
+  /* Where the data comes from.
+     With FEED_PROXY set, one cached call returns news AND market prices for
+     every visitor at once, so nobody trips the upstream rate limit.
+     Without it we fetch GDELT straight from the browser: fine on a clean IP,
+     but it fails for anyone sharing a rate-limited one, and it can never
+     reach the exchanges. */
+  async function fetchPayload(signal) {
+    if (FEED_PROXY) {
+      const res = await fetch(FEED_PROXY, { signal, cache: "no-store" });
+      if (res.status === 429) throw Object.assign(new Error("rate limited"), { rate: true });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const d = await res.json();
+      if (d.error) throw new Error(d.detail || d.error);
+      return {
+        articles: d.news || [],
+        markets: d.markets || [],
+        stale: !!d.stale,
+        ageSeconds: typeof d.ageSeconds === "number" ? d.ageSeconds : null
+      };
+    }
+    const res = await fetch(GDELT, { signal, cache: "no-store" });
+    if (res.status === 429) throw Object.assign(new Error("rate limited"), { rate: true });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const d = await res.json();
+    return { articles: d.articles || [], markets: [], stale: false, ageSeconds: 0 };
+  }
+
+  /* Real exchange prices replace the sample rows, and every label that said
+     SAMPLE flips to LIVE. If this never runs, the labels stay honest. */
+  function applyLiveMarkets(rows, stale, ageSeconds) {
+    const mapped = (rows || []).map(m => ({
+      v: String(m.venue || "").toUpperCase().slice(0, 12),
+      q: String(m.question || "").toUpperCase().slice(0, 58),
+      p: Math.round(Number(m.priceCents)),
+      cat: categorize(m.question)
+    })).filter(m => m.q && m.p > 0 && m.p < 100);
+    if (!mapped.length) return;
+    LIVE_MARKETS = mapped;
+    renderTape();
+    const badge = $("tapeBadge"), note = $("tapeNote"), ib = $("impactBadge");
+    const fresh = !stale;
+    if (badge) {
+      badge.textContent = fresh ? "LIVE" : "CACHED";
+      badge.classList.toggle("badge-live", fresh);
+    }
+    if (note) note.textContent = fresh
+      ? "REAL PRICES · " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      : "REAL PRICES · " + agoLabel(ageSeconds);
+    if (ib) {
+      ib.textContent = fresh ? "LIVE MARKETS" : "CACHED MARKETS";
+      ib.classList.toggle("badge-live", fresh);
+    }
+  }
+  const agoLabel = s => s == null ? "CACHED"
+    : s < 90 ? Math.max(1, Math.round(s)) + "S AGO"
+    : Math.round(s / 60) + " MIN AGO";
+
   async function load() {
     const seq = ++loadSeq;   // a slow older request must never clobber a newer one
     const btn = $("feedRefresh");
     if (btn) btn.classList.add("spin");
     setFeedStatus("loading", "CONNECTING");
     const ctl = new AbortController();
-    const to = setTimeout(() => ctl.abort(), 9000);
+    const to = setTimeout(() => ctl.abort(), 12000);
     try {
-      const res = await fetch(GDELT, { signal: ctl.signal, cache: "no-store" });
+      const feed = await fetchPayload(ctl.signal);
       if (seq !== loadSeq) return;
-      if (res.status === 429) throw Object.assign(new Error("rate limited"), { rate: true });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-      if (seq !== loadSeq) return;
-      const arts = (data.articles || []).filter(a => a.title).slice(0, FEED_SHOW);
+      const arts = feed.articles.filter(a => a && a.title).slice(0, FEED_SHOW);
       if (!arts.length) throw new Error("no articles");
       items = arts.map(a => {
         let ts = null;
@@ -604,9 +678,12 @@ document.querySelectorAll("[data-count]").forEach(el => {
         return { title, domain: String(a.domain || "source").slice(0, 80), url: safeUrl(a.url), ts, tone: toneOf(title), cat: categorize(title) };
       });
       selIdx = Math.min(selIdx, items.length - 1);
+      /* markets first, so the impact panel renders against live rows */
+      if (feed.markets && feed.markets.length) applyLiveMarkets(feed.markets, feed.stale, feed.ageSeconds);
       renderRows();
       renderImpact(items[selIdx]);
-      setFeedStatus("live", "LIVE · " + items.length + " HEADLINES");
+      if (feed.stale) setFeedStatus("standby", "CACHED · " + agoLabel(feed.ageSeconds));
+      else setFeedStatus("live", "LIVE · " + items.length + " HEADLINES");
     } catch (err) {
       if (seq !== loadSeq) return;   // superseded - a newer load owns the UI
       console.warn("[resolv] wire fetch failed:", err);   // diagnostics - the UI below stays honest
@@ -837,14 +914,21 @@ document.querySelectorAll("[data-count]").forEach(el => {
   });
 })();
 
-/* ---- sample tape (labeled SAMPLE in markup - never live) ---- */
-(function tape() {
+/* ---- market tape. Labelled SAMPLE until real prices arrive, then LIVE
+       with the time they were fetched. Never labelled live on sample data. ---- */
+function renderTape() {
   const track = $("tapeTrack");
   if (!track) return;
-  const item = r => `<span class="tape-item"><span class="tvn">${esc(r.v)}</span><span class="tq">${esc(r.q)}</span><b class="tv">${r.p}¢</b><span class="td ${r.d >= 0 ? "up" : "down"}">${r.d >= 0 ? "▲" : "▼"}${Math.abs(r.d)}</span></span>`;
-  const half = SAMPLE_MARKETS.map(item).join("");
+  const item = r => {
+    const delta = typeof r.d === "number"
+      ? `<span class="td ${r.d >= 0 ? "up" : "down"}">${r.d >= 0 ? "▲" : "▼"}${Math.abs(r.d)}</span>`
+      : "";
+    return `<span class="tape-item"><span class="tvn">${esc(r.v)}</span><span class="tq">${esc(r.q)}</span><b class="tv">${r.p}¢</b>${delta}</span>`;
+  };
+  const half = marketRows().map(item).join("");
   track.innerHTML = half + half;   // doubled for the seamless loop
-})();
+}
+renderTape();
 
 /* ---------------- initial paint ---------------- */
 sizeAll();

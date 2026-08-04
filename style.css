@@ -525,6 +525,10 @@ footer{border-top:1px solid var(--line);padding:44px 0;background:var(--s1)}
   pointer-events:none;background:radial-gradient(closest-side,rgba(77,181,255,.15),transparent)}
 .cta-band .wrap{position:relative}
 
+/* ---- badge flips from amber SAMPLE to green LIVE only when the data
+       really is live (set by applyLiveMarkets in script.js) ---- */
+.badge-sample.badge-live{border-color:#1d5f43;background:var(--up-dim);color:var(--up)}
+
 /* ---- the wire: live feed + impact panel ---- */
 .wire{display:grid;grid-template-columns:minmax(0,1.38fr) minmax(0,1fr);gap:16px;align-items:stretch}
 .wire .feed{display:flex;flex-direction:column}
