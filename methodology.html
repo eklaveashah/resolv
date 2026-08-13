@@ -16,8 +16,10 @@
 <meta property="og:site_name" content="Resolv">
 <meta property="og:title" content="How Resolv Works · Methodology">
 <meta property="og:description" content="The five-stage pipeline, the two model families, and how we score our own forecasts.">
+<meta property="og:url" content="https://resolvterminal.com/methodology.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="How Resolv Works · Methodology">
+<meta name="twitter:description" content="The five-stage pipeline, the two model families, and how we score our own forecasts.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307090b'/%3E%3Ccircle cx='11' cy='12' r='4' fill='%23bd8a10'/%3E%3Ccircle cx='22' cy='20' r='3' fill='%234db5ff'/%3E%3Cpath d='M11 12 L22 20' stroke='%23e05a6d' stroke-width='1.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,6 +66,7 @@
     <div class="doc-toc">
       <a href="#pipeline">The pipeline</a>
       <a href="#models">The two models</a>
+      <a href="#walkthrough">Worked example</a>
       <a href="#evidence">Evidence</a>
       <a href="#risk">Resolution risk</a>
       <a href="#calibration">Calibration</a>
@@ -149,6 +152,110 @@
           <p class="micro">Most contracts, most of the time, are priced about right. A tool that always has an opinion isn't a model.</p>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ WALKTHROUGH · ONE CONTRACT, END TO END ══════════ -->
+<section class="band" id="walkthrough">
+  <div class="wrap narrow">
+    <div class="section-head rv">
+      <p class="kicker">Worked example</p>
+      <h2 class="statement sm">One contract,<br>end to end.</h2>
+      <p class="lede">The stages above are explained one at a time. Here is the contract from the tables, &ldquo;Fed cuts rates&rdquo; trading at 58.0&cent;, walked through the whole pipeline in order: what comes in, what links, what the model does, what the gate says, and how much to risk.</p>
+    </div>
+
+    <div class="wk-frame rv">
+      <div class="wk-head">
+        <b>&ldquo;Fed cuts rates&rdquo; &middot; 58.0&cent; on the exchange</b>
+        <span class="badge-sample">EXAMPLE</span>
+      </div>
+
+      <ol class="wk-steps">
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">01</span>
+          <div class="wk-content">
+            <p class="wk-stage">INGEST</p>
+            <h3 class="wk-title">Pull the market</h3>
+            <p class="wk-why">Both exchanges are polled; this venue prints 58.0&cent;, the other prints a touch lower, and the contract's resolution text comes along with the snapshot.</p>
+            <div class="wk-data">
+              <span class="wk-chip">This exchange <b>58.0&cent;</b></span>
+              <span class="wk-chip">Other venue <b>lower</b></span>
+              <span class="wk-chip">Rules text <b>captured</b></span>
+            </div>
+          </div>
+        </li>
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">02</span>
+          <div class="wk-content">
+            <p class="wk-stage">LINK</p>
+            <h3 class="wk-title">Attach the evidence</h3>
+            <p class="wk-why">Three headlines share enough words and entities with this contract to link to it, each weighted by relevance, source credibility, and recency.</p>
+            <div class="wk-data">
+              <span class="wk-chip">Linked headlines <b>3</b></span>
+              <span class="wk-chip">Older news <b>fades</b></span>
+              <span class="wk-chip">Total nudge <b>capped</b></span>
+            </div>
+          </div>
+        </li>
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">03</span>
+          <div class="wk-content">
+            <p class="wk-stage">PRICE</p>
+            <h3 class="wk-title">Reprice it</h3>
+            <p class="wk-why">A committee decision has no price feed, so the log-odds model starts from the market's 58.0&cent; and moves it exactly as far as the evidence justifies, no further.</p>
+            <div class="attrib wk-attrib">
+              <div class="attrib-row head"><span>What moved it</span><span></span><span class="val">Change</span></div>
+              <div class="attrib-row"><span>Exchange price</span><span></span><span class="val dim">58.0&cent;</span></div>
+              <div class="attrib-row"><span>Crowd bias correction</span><span></span><span class="val up">+0.5</span></div>
+              <div class="attrib-row"><span>News</span><span></span><span class="val up">+5.6</span></div>
+              <div class="attrib-row"><span>Other exchange disagrees</span><span></span><span class="val down">&minus;0.4</span></div>
+              <div class="attrib-row"><span>Vague rules discount</span><span></span><span class="val down">&minus;0.6</span></div>
+              <div class="attrib-row total"><span><b>Fair value</b></span><span></span><span class="val accent">63.1&cent;</span></div>
+            </div>
+            <div class="wk-data">
+              <span class="wk-chip">Model confidence <b>73%</b></span>
+            </div>
+          </div>
+        </li>
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">04</span>
+          <div class="wk-content">
+            <p class="wk-stage">GATE</p>
+            <h3 class="wk-title">Pass the gate</h3>
+            <p class="wk-why">The gap between 63.1 and 58.0 is +5.1 points; that clears the 4 point bar, confidence clears 50%, and evidence exists, so the call fires instead of &ldquo;sit this one out&rdquo;.</p>
+            <div class="wk-data">
+              <span class="wk-chip">Edge &ge; 4 pts <b class="up">+5.1 &#10003;</b></span>
+              <span class="wk-chip">Confidence &ge; 50% <b class="up">73% &#10003;</b></span>
+              <span class="wk-chip">Evidence &ge; 1 source <b class="up">3 &#10003;</b></span>
+            </div>
+          </div>
+        </li>
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">05</span>
+          <div class="wk-content">
+            <p class="wk-stage">SIZE</p>
+            <h3 class="wk-title">Size the position</h3>
+            <p class="wk-why">Half of the full Kelly stake for this edge and this confidence works out to 3.5% of bankroll, well under the 15% ceiling.</p>
+            <div class="wk-data">
+              <span class="wk-chip">Half-Kelly stake <b>3.5% of bankroll</b></span>
+              <span class="wk-chip">Hard cap <b>15%</b></span>
+            </div>
+            <div class="wk-verdict">
+              <span class="hcv-tag buy">BUY</span>
+              <span class="wk-note">Fair value 63.1&cent; vs 58.0&cent; market &middot; +5.1 point edge &middot; 73% confidence &middot; 3.5% of bankroll</span>
+            </div>
+          </div>
+        </li>
+
+      </ol>
+
+      <p class="wk-foot">Nothing here is a special demo path: the same walk-through runs on every contract, on every refresh.</p>
     </div>
   </div>
 </section>
@@ -250,7 +357,7 @@
 </main>
 
 <footer>
-  <div class="wrap foot-inner">
+  <div class="wrap foot-inner rv">
     <div class="foot-brand">
       <span class="logo">resolv<span class="logo-dot"></span></span>
       <div class="foot-links">

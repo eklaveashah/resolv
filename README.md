@@ -206,6 +206,6 @@ only runs the parts it actually has.
 - The terminal and evidence-graph apps live in `../Prototype/` and are **not**
   linked from either page. If you later want a public demo, upload one and point
   the CTAs at it.
-- Pricing is a 14-day free trial with no card, then $20 Basic / $99 Pro / custom
-  Desk. The same figures appear in `../Prototype/Resolv Terminal - Functional.html`
+- Pricing is a 14-day free trial with no card, then $12 Basic / $39 Pro / custom
+  Desk. The same figures appear in `../Prototype/Resolv Terminal.html`
   - keep them in sync if you change them.

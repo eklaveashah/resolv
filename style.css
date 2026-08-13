@@ -578,6 +578,169 @@ footer{border-top:1px solid var(--line);padding:44px 0;background:var(--s1)}
 .standby-pulse:after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:var(--warn);transform:translate(-50%,-50%);box-shadow:0 0 10px var(--warn)}
 @keyframes ring{0%{transform:scale(.2);opacity:.85}100%{transform:scale(1);opacity:0}}
 
+/* ═════════════════════════════════════════════════════════════
+   V5.4 - FLUID LAYER (Apple design pass)
+   Press feedback on pointer-down, materials that read as depth,
+   spatially-anchored menus, size-aware type, and gentler motion
+   for reduced-motion, reduced-transparency and high-contrast.
+   ═════════════════════════════════════════════════════════════ */
+
+/* ---- response: feedback lives on the press, instantly ---- */
+.btn{transition:transform .18s var(--ease),border-color .18s var(--ease),color .18s var(--ease),background .18s var(--ease),box-shadow .18s var(--ease)}
+.btn:active{transform:translateY(0) scale(.965);transition-duration:.07s}
+.refresh-btn:active,.navtoggle:active{transform:scale(.9);transition-duration:.07s}
+.navlinks a:active{background:var(--s3);transition-duration:.07s}
+.doc-toc a:active{transform:translateY(0) scale(.96)}
+.rail-btn:active{background:var(--s3)}
+.faq summary{transition:background .15s}
+.faq summary:active{background:var(--s2)}
+.wire .feed-row:active{background:var(--s3)}
+
+/* ---- materials: light catches the top edge of raised surfaces ---- */
+.card{box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.price-card{box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.pstat{box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.feed{box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.proof-chart{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.045)}
+.impact{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.045)}
+.hero-card{box-shadow:var(--shadow-lift),inset 0 1px 0 rgba(255,255,255,.05)}
+
+/* ---- chrome: scroll-edge softness instead of a hard divider ---- */
+.nav.stuck{border-bottom-color:rgba(30,37,45,.55);
+  box-shadow:0 14px 30px -18px rgba(0,0,0,.55)}
+
+/* ---- spatial consistency: the menu materializes from its trigger ---- */
+@media(max-width:720px){
+  .mobilemenu{display:block;visibility:hidden;opacity:0;
+    transform:translateY(-10px) scale(.985);transform-origin:top right;
+    background:rgba(7,9,11,.9);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);
+    transition:opacity .22s var(--ease),transform .22s var(--ease),visibility 0s linear .22s}
+  .mobilemenu.open{display:block;visibility:visible;opacity:1;transform:none;
+    transition:opacity .26s var(--ease),transform .26s var(--ease)}
+}
+
+/* ---- disclosure: content arrives, it does not pop ---- */
+.faq details[open] .fa{animation:faqIn .28s var(--ease)}
+@keyframes faqIn{from{opacity:0;transform:translateY(-5px)}}
+
+/* ---- type: optical craft ---- */
+html{scroll-padding-top:82px}
+.display,.statement,.hc-q,.section-head h2{text-wrap:balance}
+body{font-optical-sizing:auto}
+
+/* ---- motion: slower, smaller idle float (avoid slow-loop discomfort) ---- */
+.hero-card{animation-duration:10s}
+
+/* ---- reduced transparency: frost the glass ---- */
+@media(prefers-reduced-transparency:reduce){
+  .nav.stuck,.mobilemenu{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}
+  .grain{display:none}
+  .bg-aurora{display:none}
+}
+
+/* ---- high contrast: defined edges, brighter secondary text ---- */
+@media(prefers-contrast:more){
+  :root{--line:#2b343d;--line2:#3f4b57;--muted:#8b96a1;--faint:#6b7681}
+  .card,.price-card,.feed,.impact,.pstat,.proof-chart,.tape{border-color:var(--line2)}
+  .badge-sample{border-width:1.5px}
+}
+
+/* ═════════════════════════════════════════════════════════════
+   V5.5 - WHAT-IT-DOES CHOREOGRAPHY
+   The three card visuals animate once, when the card reveals:
+   the scan finds the outlier, the evidence links draw to their
+   source, the stake bar fills to its cap. Hidden states exist
+   only under .js and are force-restored for reduced motion, so
+   the graphics can never be stranded invisible.
+   ═════════════════════════════════════════════════════════════ */
+.card-viz rect,.card-viz circle,.card-viz path{transform-box:fill-box}
+
+/* 01 · the scan: bars rise in order, the outlier lands last with a halo */
+.js .vcard .viz-bars rect{transform:scaleY(0);transform-origin:bottom}
+.js .vcard.in .viz-bars rect{animation:vizBar .45s var(--ease) forwards}
+.js .vcard.in .viz-bars rect:nth-child(1){animation-delay:.05s}
+.js .vcard.in .viz-bars rect:nth-child(2){animation-delay:.10s}
+.js .vcard.in .viz-bars rect:nth-child(3){animation-delay:.15s}
+.js .vcard.in .viz-bars rect:nth-child(4){animation-delay:.20s}
+.js .vcard.in .viz-bars rect:nth-child(5){animation-delay:.25s}
+.js .vcard.in .viz-bars rect:nth-child(6){animation-delay:.30s}
+.js .vcard.in .viz-bars rect:nth-child(7){animation-delay:.35s}
+.js .vcard.in .viz-bars rect:nth-child(8){animation-delay:.40s}
+.js .vcard.in .viz-bars rect:nth-child(9){animation-delay:.45s}
+.js .vcard.in .viz-bars rect:nth-child(10){animation-delay:.50s}
+@keyframes vizBar{to{transform:scaleY(1)}}
+.js .vcard .viz-outlier{transform:scaleY(0);transform-origin:bottom}
+.js .vcard.in .viz-outlier{animation:vizBar .5s var(--ease) .62s forwards}
+.js .vcard .viz-halo{opacity:0}
+.js .vcard.in .viz-halo{animation:vizHalo 2.6s ease-out 1.1s 2}
+@keyframes vizHalo{0%{opacity:0;transform:scale(.6);transform-origin:center}
+  30%{opacity:.8}100%{opacity:0;transform:scale(1.5)}}
+
+/* 02 · the evidence: links draw outward, sources pop as they connect */
+.js .vcard .viz-links path{stroke-dasharray:1;stroke-dashoffset:1}
+.js .vcard.in .viz-links path{animation:vizDraw .5s var(--ease) forwards}
+.js .vcard.in .viz-links path:nth-child(1){animation-delay:.25s}
+.js .vcard.in .viz-links path:nth-child(2){animation-delay:.40s}
+.js .vcard.in .viz-links path:nth-child(3){animation-delay:.55s}
+.js .vcard.in .viz-links path:nth-child(4){animation-delay:.70s}
+@keyframes vizDraw{to{stroke-dashoffset:0}}
+.js .vcard .viz-dot{transform:scale(0);transform-origin:center}
+.js .vcard.in .viz-dot{animation:vizPop .4s var(--ease) forwards}
+.js .vcard.in .viz-dot:nth-of-type(1){animation-delay:.60s}
+.js .vcard.in .viz-dot:nth-of-type(2){animation-delay:.75s}
+.js .vcard.in .viz-dot:nth-of-type(3){animation-delay:.90s}
+.js .vcard.in .viz-dot:nth-of-type(4){animation-delay:1.05s}
+@keyframes vizPop{60%{transform:scale(1.25)}to{transform:scale(1)}}
+.js .vcard .viz-core{transform:scale(0);transform-origin:center}
+.js .vcard.in .viz-core{animation:vizPop .45s var(--ease) .1s forwards}
+.js .vcard .viz-ring{opacity:0}
+.js .vcard.in .viz-ring{animation:vizRing 1.6s ease-out .9s forwards}
+@keyframes vizRing{0%{opacity:0;transform:scale(.5);transform-origin:center}
+  40%{opacity:1}100%{opacity:1;transform:scale(1)}}
+
+/* 03 · the stake: the bar fills, then the hard cap asserts itself */
+.js .vcard .viz-fill{transform:scaleX(0);transform-origin:left}
+.js .vcard.in .viz-fill{animation:vizFill .8s var(--ease) .3s forwards}
+@keyframes vizFill{to{transform:scaleX(1)}}
+.js .vcard .viz-cap{opacity:0}
+.js .vcard.in .viz-cap{animation:vizCap .7s var(--ease) 1s forwards}
+@keyframes vizCap{0%{opacity:0;transform:translateY(-4px)}45%{opacity:1}
+  60%{opacity:.35}75%{opacity:1}100%{opacity:1;transform:none}}
+.js .vcard .viz-txt{opacity:0}
+.js .vcard.in .viz-txt{animation:vizTxt .5s ease 1.2s forwards}
+@keyframes vizTxt{to{opacity:1}}
+
+/* hover: the icon acknowledges you, the halo scans again */
+.card .ico{transition:transform .18s var(--ease)}
+.vcard:hover .ico{transform:scale(1.07)}
+.vcard:active .ico{transform:scale(.96);transition-duration:.07s}
+.js .vcard.in:hover .viz-halo{animation:vizHalo 1.4s ease-out 1}
+
+/* hover-lift restore: .js .rv.in (0,3,0) outranks .card:hover and
+   .price-card:hover (0,2,0), so the lift transforms declared in the
+   CARDS and PRICING sections never applied on revealed cards.
+   Restate them at winning specificity (the price-card rule also
+   outranks the arrival layer's .js .price-grid .price-card.rv.in
+   force-final). The reduced-motion kill switch still wins: its
+   transform:none!important on .js .rv beats these normal rules. */
+.js .card.rv.in:hover{transform:translateY(-3px)}
+.js .price-grid .price-card.rv.in:hover{transform:translateY(-4px)}
+
+/* failsafe (.viz-done set by JS after 6s) and reduced motion share one rule:
+   everything rests at its final, fully-drawn state, never stranded hidden */
+.js .vcard.viz-done .viz-bars rect,.js .vcard.viz-done .viz-outlier,.js .vcard.viz-done .viz-dot,
+.js .vcard.viz-done .viz-core,.js .vcard.viz-done .viz-fill{transform:none!important}
+.js .vcard.viz-done .viz-links path{stroke-dashoffset:0!important}
+.js .vcard.viz-done .viz-halo{opacity:0!important}
+.js .vcard.viz-done .viz-ring,.js .vcard.viz-done .viz-cap,.js .vcard.viz-done .viz-txt{opacity:1!important}
+@media(prefers-reduced-motion:reduce){
+  .js .vcard .viz-bars rect,.js .vcard .viz-outlier,.js .vcard .viz-dot,
+  .js .vcard .viz-core,.js .vcard .viz-fill{transform:none!important}
+  .js .vcard .viz-links path{stroke-dashoffset:0!important}
+  .js .vcard .viz-halo{opacity:0!important}
+  .js .vcard .viz-ring,.js .vcard .viz-cap,.js .vcard .viz-txt{opacity:1!important}
+}
+
 /* ---- v5 responsive ---- */
 @media(max-width:1000px){
   .hero-bg{opacity:.45}
@@ -589,4 +752,255 @@ footer{border-top:1px solid var(--line);padding:44px 0;background:var(--s1)}
   .tape,.tape-item{height:46px}
   .card-viz{height:48px}
   .impact-body{padding:18px}
+}
+
+/* ═══════════ WALKTHROUGH · one contract end to end (methodology) ═══════════
+   New classes are wk- prefixed. Reuses existing tokens plus .attrib,
+   .badge-sample and .hcv-tag from above. All rest states are fully
+   legible with animations and transitions disabled. */
+.wk-frame{border:1px solid var(--line);border-radius:16px;background:var(--s1);overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.wk-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:18px 24px;border-bottom:1px solid var(--line);background:var(--s2)}
+.wk-head b{font-size:15.5px;letter-spacing:-.02em}
+.wk-steps{list-style:none;margin:0;padding:30px 28px 4px;position:relative}
+.wk-step{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr);gap:0 22px;padding-bottom:36px}
+.wk-step:last-child{padding-bottom:28px}
+/* the connecting vertical line, one segment per stage */
+.wk-step:before{content:"";position:absolute;left:16px;top:42px;bottom:6px;width:2px;border-radius:2px;
+  background:linear-gradient(180deg,var(--accent-dim),var(--line) 72%)}
+.wk-step:last-child:before{display:none}
+.wk-node{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  border:1px solid var(--line2);background:var(--s2);
+  font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);
+  transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
+.wk-step:hover .wk-node{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-dim)}
+.wk-content{min-width:0}
+.wk-stage{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--accent);margin:9px 0 8px}
+.wk-title{font-size:18px;letter-spacing:-.02em;margin-bottom:8px}
+.wk-why{color:var(--soft);font-size:14.5px;line-height:1.68;max-width:58ch}
+.wk-data{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.wk-chip{display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 12px;
+  border:1px solid var(--line);border-radius:8px;background:var(--bg);
+  font-family:var(--mono);font-size:11px;color:var(--muted)}
+.wk-chip b{color:var(--text);font-weight:700}
+.wk-chip b.up{color:var(--up)}
+.wk-attrib{margin-top:14px;max-width:430px}
+.wk-verdict{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:18px;
+  padding-top:16px;border-top:1px solid var(--line)}
+.wk-note{font-size:13px;color:var(--muted);line-height:1.6}
+.wk-foot{display:flex;align-items:center;gap:11px;padding:18px 24px;border-top:1px solid var(--line);
+  background:var(--s2);color:var(--muted);font-size:13.5px;line-height:1.6}
+.wk-foot:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+@media(max-width:720px){
+  .wk-head,.wk-foot{padding:16px 18px}
+  .wk-steps{padding:24px 16px 2px}
+  .wk-step{gap:0 14px;padding-bottom:30px}
+  .wk-why{font-size:14px}
+  .wk-attrib{max-width:none}
+}
+
+/* ═════════════════════════════════════════════════════════════
+   INDEX ADD-ONS (append to the END of style.css)
+   1) .step-  "From headline to sized position" stepper strip
+   2) .hb-    "Honest by design" compact band
+   Tokens only. Motion is killed by the site's global
+   prefers-reduced-motion block; every rest state is fully
+   legible with no JS and no animation.
+   ═════════════════════════════════════════════════════════════ */
+
+/* ---- stepper strip ---- */
+.step-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.step-item{position:relative}
+.step-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.step-item .ico{margin-bottom:0}
+.step-glyph{width:24px;height:24px;flex:none;opacity:.9}
+.step-item h3{font-size:17px}
+.step-item p{font-size:14.5px}
+
+/* connector: a lit line with an arrowhead, drawn across each grid gap.
+   Own element (not a pseudo) so it can never collide with .glow. */
+.step-link{position:absolute;top:49px;right:-16px;width:16px;height:2px;border-radius:2px;pointer-events:none;
+  background:linear-gradient(90deg,var(--line2),rgba(77,181,255,.75))}
+.step-link:after{content:"";position:absolute;right:1px;top:50%;width:5px;height:5px;margin-top:-4px;
+  border-top:2px solid var(--accent);border-right:2px solid var(--accent);border-radius:1px;transform:rotate(45deg)}
+
+/* ---- honesty band (compact) ---- */
+.band.hb-band{padding:84px 0}
+.hb-band .section-head{margin-bottom:36px}
+.hb-panel{position:relative;display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);
+  border-radius:16px;background:var(--s1);overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.hb-panel:after{content:"";position:absolute;top:0;left:14%;right:14%;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(77,181,255,.4),transparent)}
+.hb-item{padding:26px 28px;border-right:1px solid var(--line)}
+.hb-item:last-child{border-right:0}
+.hb-item h3{font-size:16.5px;letter-spacing:-.022em;margin:16px 0 8px}
+.hb-item p{color:var(--muted);font-size:14px;line-height:1.6}
+.hb-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-height:20px}
+.hb-pill{display:inline-flex;align-items:center;gap:7px;height:20px;padding:0 9px;border:1px solid #5c4a1d;
+  background:var(--warn-dim);border-radius:6px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--warn)}
+.hb-dot{width:6px;height:6px;border-radius:50%;background:var(--warn);animation:pulse 1.6s ease-in-out infinite}
+.hb-sum{display:inline-flex;align-items:center;height:20px;padding:0 9px;border:1px solid var(--line2);
+  background:var(--s3);border-radius:6px;font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--soft);white-space:nowrap}
+.hb-sum b{color:var(--up);font-weight:700;margin-left:5px}
+
+/* ---- press feedback on the clickable bits (site convention: fast, ~.97) ---- */
+.step-band .fine a,.hb-band .fine a{display:inline-block;transition:transform .18s var(--ease),color .18s var(--ease)}
+.step-band .fine a:active,.hb-band .fine a:active{transform:scale(.97);transition-duration:.07s}
+
+/* ---- responsive ---- */
+@media(max-width:1000px){
+  .step-strip{grid-template-columns:1fr}
+  .step-link{top:auto;right:auto;bottom:-16px;left:49px;width:2px;height:16px;
+    background:linear-gradient(180deg,var(--line2),rgba(77,181,255,.75))}
+  .step-link:after{right:auto;top:auto;left:50%;bottom:1px;margin:0 0 0 -4px;transform:rotate(135deg)}
+  .hb-panel{grid-template-columns:1fr}
+  .hb-item{border-right:0;border-bottom:1px solid var(--line)}
+  .hb-item:last-child{border-bottom:0}
+}
+@media(max-width:720px){
+  .band.hb-band{padding:60px 0}
+  .hb-item{padding:22px 24px}
+}
+
+/* ---- high contrast: defined edges, matching the site's contrast pass ---- */
+@media(prefers-contrast:more){
+  .hb-panel,.hb-item{border-color:var(--line2)}
+}
+/* ═════════════════════════════════════════════════════════════
+   V5.6 - ARRIVAL LAYER (append to the END of style.css)
+   Five restrained entrances: one-shot on reveal, house bezier,
+   transform and opacity only, no bounce, no loops.
+     1) pricing cards rise in sequence; the Pro conic border
+        catches the light once (needs the .price-sheen span,
+        see anim-patches.md)
+     2) proof numbers settle onto their cards
+     3) fresh wire rows cascade in, keyed off .wire-fresh,
+        which JS adds only after a load (see anim-patches.md)
+     4) stepper connectors draw toward the next step
+     5) the CTA band and footer arrive instead of popping
+        (footer needs the rv class, see anim-patches.md)
+   Safety shape: every hidden frame lives INSIDE @keyframes with
+   backwards fill, so the resting cascade is always the final,
+   fully legible state; if the animation engine never runs, the
+   page simply shows finished states. Pre-reveal hiding stays on
+   the site's own .rv machinery (geometry sweep + observer +
+   2.6s timeout). Force-final restatements and a reduced-motion
+   block close the loop at the end. */
+
+/* ---- 1 · pricing: cards rise in sequence, 60ms apart ----
+   The reveal is animation-driven here, so the card's transition
+   returns to the .25s hover/press timing its own block intended,
+   and the zeroed delay overrides the inline stagger delay the
+   reveal engine writes (that inline delay ordered the three
+   cards 240/0/80ms: featured first, Basic last). */
+.js .price-grid .price-card.rv{
+  transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s var(--ease);
+  transition-delay:0s!important}
+.js .price-grid .price-card.rv.in{animation:priceRise .7s var(--ease) backwards}
+.js .price-grid .price-card.rv.in:nth-child(2){animation-delay:.06s}
+.js .price-grid .price-card.rv.in:nth-child(3){animation-delay:.12s}
+@keyframes priceRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+
+/* the Pro conic border catches the light once, after the card
+   lands. Own element, never a pseudo (.glow owns both pseudos on
+   .price-card), masked to the 1px border ring the same way .glow
+   is. Rests off-canvas before AND after: invisible is its correct
+   final state, so it needs no force-final rule. */
+.price-sheen{position:absolute;inset:-1px;border-radius:20px;padding:1px;overflow:hidden;pointer-events:none;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude}
+.price-sheen:after{content:"";position:absolute;top:-40%;bottom:-40%;left:-35%;width:46%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);
+  transform:rotate(14deg) translateX(-320%)}
+.js .price-card.feat.in .price-sheen:after{animation:priceSheen 1.5s var(--ease) 1.05s 1}
+@keyframes priceSheen{from{transform:rotate(14deg) translateX(-320%)}to{transform:rotate(14deg) translateX(640%)}}
+
+/* ---- 2 · proof: the numbers settle onto their cards ----
+   Opacity + 6px rise on the big figure only, 90ms apart, starting
+   just after each card begins its own reveal. The [data-count]
+   count-up JS writes textContent and is untouched by this. */
+.js .pstat.in b{animation:statSettle .55s var(--ease) .12s backwards}
+.js .proof-stats .pstat.in:nth-child(2) b{animation-delay:.21s}
+.js .proof-stats .pstat.in:nth-child(3) b{animation-delay:.3s}
+@keyframes statSettle{from{opacity:0;transform:translateY(6px)}}
+
+/* ---- 3 · wire: fresh headlines cascade in ----
+   .wire-fresh is added by JS only after a successful load and
+   self-clears 900ms later (see anim-patches.md), so the rebuilds
+   from selection clicks and the 20s timestamp tick render still.
+   No hidden base state exists: without the class, rows simply sit
+   at their final state, including the standby and error panes. */
+.js .feed-rows.wire-fresh .feed-row{animation:rowIn .38s var(--ease) backwards}
+.js .feed-rows.wire-fresh .feed-row:nth-child(2){animation-delay:.05s}
+.js .feed-rows.wire-fresh .feed-row:nth-child(3){animation-delay:.1s}
+.js .feed-rows.wire-fresh .feed-row:nth-child(4){animation-delay:.15s}
+.js .feed-rows.wire-fresh .feed-row:nth-child(5){animation-delay:.2s}
+.js .feed-rows.wire-fresh .feed-row:nth-child(6){animation-delay:.25s}
+.js .feed-rows.wire-fresh .feed-row:nth-child(n+7){animation-delay:.3s}
+@keyframes rowIn{from{opacity:0;transform:translateY(7px)}}
+
+/* ---- 4 · stepper: connectors draw toward the next step ----
+   Each line draws left to right after its own card has risen,
+   sequenced across the strip; the arrowhead fades in only once
+   its line has landed, so it is never shown squashed mid-draw.
+   The fourth card has no .step-link, so nth-child stops at 3. */
+.js .step-strip .step-item.in .step-link{transform-origin:left center;animation:linkDrawX .4s var(--ease) backwards}
+.js .step-strip .step-item.in:nth-child(1) .step-link{animation-delay:.55s}
+.js .step-strip .step-item.in:nth-child(2) .step-link{animation-delay:.7s}
+.js .step-strip .step-item.in:nth-child(3) .step-link{animation-delay:.85s}
+.js .step-strip .step-item.in .step-link:after{animation:linkTip .25s var(--ease) backwards}
+.js .step-strip .step-item.in:nth-child(1) .step-link:after{animation-delay:.85s}
+.js .step-strip .step-item.in:nth-child(2) .step-link:after{animation-delay:1s}
+.js .step-strip .step-item.in:nth-child(3) .step-link:after{animation-delay:1.15s}
+@keyframes linkDrawX{from{transform:scaleX(0)}}
+@keyframes linkTip{from{opacity:0}}
+/* below 1000px the connector is vertical (site's own breakpoint),
+   so it draws downward instead; the nth-child delay rules above
+   still win the delay longhand at higher specificity */
+@media(max-width:1000px){
+  .js .step-strip .step-item.in .step-link{animation-name:linkDrawY;transform-origin:center top}
+}
+@keyframes linkDrawY{from{transform:scaleY(0)}}
+
+/* ---- 5 · arrival: CTA band and footer ----
+   The CTA band takes a slightly longer, softer path in, ordered
+   heading, sub, form (the inline reveal delays ordered them
+   240/0/80ms); the footer, once rv is added in markup, rises
+   gently on the same machinery. The hides are scoped :not(.in)
+   so they can never tie with the site's .rv.in restore rule. */
+.js .cta-band .rv{transition-duration:1.05s}
+.js .cta-band .rv:not(.in){transform:translateY(18px)}
+.js .cta-band .statement.rv{transition-delay:0s!important}
+.js .cta-band .cta-sub.rv{transition-delay:.12s!important}
+.js .cta-band .wait-form.rv{transition-delay:.24s!important}
+.js .foot-inner.rv{transition-duration:.9s;transition-delay:0s!important}
+.js .foot-inner.rv:not(.in){transform:translateY(14px)}
+
+/* ---- force-final failsafes ----
+   Belt and braces in the spirit of .viz-done, without needing a
+   timer class: the final states are restated at winning
+   specificity so no later tie, and no absent animation engine,
+   can strand anything short of fully legible. While an entrance
+   animation runs it outranks these normal declarations, then
+   hands back to exactly these values. */
+.js .price-grid .price-card.rv.in{opacity:1;transform:none}
+.js .cta-band .rv.in,.js .foot-inner.rv.in{opacity:1;transform:none}
+.js .pstat.in b{opacity:1;transform:none}
+.js .step-item.in .step-link{transform:none}
+.js .step-item.in .step-link:after{opacity:1}
+.js .feed-rows .feed-row{opacity:1}
+
+/* ---- reduced motion: mirror of the site's pattern ----
+   The global kill switch earlier in this file already stops every
+   animation and transition; these restatements force each final
+   state explicitly so nothing depends on that ordering. */
+@media(prefers-reduced-motion:reduce){
+  .js .price-card.rv,.js .cta-band .rv,.js .foot-inner.rv{opacity:1!important;transform:none!important}
+  .js .pstat b{opacity:1!important;transform:none!important}
+  .js .step-item .step-link{transform:none!important}
+  .js .step-item .step-link:after{opacity:1!important}
+  .js .feed-rows .feed-row{opacity:1!important;transform:none!important}
+  .price-sheen{display:none!important}
 }

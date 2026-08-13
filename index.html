@@ -137,15 +137,15 @@
         <h3>Finds the mispriced ones</h3>
         <p>We watch every open contract on both exchanges and flag the ones trading away from what the evidence says they're worth.</p>
         <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
-          <g fill="#2b343d">
+          <g fill="#2b343d" class="viz-bars">
             <rect x="6"   y="30" width="9" height="20" rx="2"/><rect x="24"  y="24" width="9" height="26" rx="2"/>
             <rect x="42"  y="34" width="9" height="16" rx="2"/><rect x="60"  y="27" width="9" height="23" rx="2"/>
             <rect x="78"  y="31" width="9" height="19" rx="2"/><rect x="114" y="25" width="9" height="25" rx="2"/>
             <rect x="132" y="33" width="9" height="17" rx="2"/><rect x="150" y="28" width="9" height="22" rx="2"/>
             <rect x="168" y="35" width="9" height="15" rx="2"/><rect x="186" y="26" width="9" height="24" rx="2"/>
           </g>
-          <circle cx="100.5" cy="14" r="9" fill="none" stroke="#4db5ff" stroke-opacity=".35" stroke-width="4"/>
-          <rect x="96" y="10" width="9" height="40" rx="2" fill="#4db5ff"/>
+          <circle class="viz-halo" cx="100.5" cy="14" r="9" fill="none" stroke="#4db5ff" stroke-opacity=".35" stroke-width="4"/>
+          <rect class="viz-outlier" x="96" y="10" width="9" height="40" rx="2" fill="#4db5ff"/>
         </svg>
       </div>
       <div class="card vcard rv">
@@ -153,13 +153,13 @@
         <h3>Shows you why</h3>
         <p>Every call comes with the headlines and numbers behind it. If we can't point to a reason, we don't make the call.</p>
         <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
-          <g stroke="#e05a6d" stroke-opacity=".55" stroke-width="1.4">
-            <path d="M110 28 L34 12"/><path d="M110 28 L52 46"/><path d="M110 28 L176 10"/><path d="M110 28 L188 42"/>
+          <g stroke="#e05a6d" stroke-opacity=".55" stroke-width="1.4" class="viz-links">
+            <path pathLength="1" d="M110 28 L34 12"/><path pathLength="1" d="M110 28 L52 46"/><path pathLength="1" d="M110 28 L176 10"/><path pathLength="1" d="M110 28 L188 42"/>
           </g>
-          <circle cx="34" cy="12" r="5" fill="#4d8be0"/><circle cx="52" cy="46" r="5" fill="#4d8be0"/>
-          <circle cx="176" cy="10" r="5" fill="#4d8be0"/><circle cx="188" cy="42" r="5" fill="#4d8be0"/>
-          <circle cx="110" cy="28" r="10" fill="#bd8a10"/>
-          <circle cx="110" cy="28" r="15" fill="none" stroke="#bd8a10" stroke-opacity=".3" stroke-width="2"/>
+          <circle class="viz-dot" cx="34" cy="12" r="5" fill="#4d8be0"/><circle class="viz-dot" cx="52" cy="46" r="5" fill="#4d8be0"/>
+          <circle class="viz-dot" cx="176" cy="10" r="5" fill="#4d8be0"/><circle class="viz-dot" cx="188" cy="42" r="5" fill="#4d8be0"/>
+          <circle class="viz-core" cx="110" cy="28" r="10" fill="#bd8a10"/>
+          <circle class="viz-ring" cx="110" cy="28" r="15" fill="none" stroke="#bd8a10" stroke-opacity=".3" stroke-width="2"/>
         </svg>
       </div>
       <div class="card vcard rv">
@@ -168,11 +168,11 @@
         <p>A suggested stake based on how big the edge is and how sure we are, capped so one bad call can't wipe you out.</p>
         <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
           <rect x="6" y="22" width="208" height="12" rx="6" fill="#181d24"/>
-          <rect x="6" y="22" width="52" height="12" rx="6" fill="url(#szg)"/>
+          <rect class="viz-fill" x="6" y="22" width="52" height="12" rx="6" fill="url(#szg)"/>
           <defs><linearGradient id="szg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4db5ff"/><stop offset="1" stop-color="#3ddc97"/></linearGradient></defs>
-          <rect x="119" y="16" width="2.5" height="24" rx="1" fill="#ff6b7d"/>
-          <text x="6" y="52" font-family="JetBrains Mono,monospace" font-size="9" fill="#626d78">suggested</text>
-          <text x="123" y="52" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff6b7d" fill-opacity=".8">hard cap</text>
+          <rect class="viz-cap" x="119" y="16" width="2.5" height="24" rx="1" fill="#ff6b7d"/>
+          <text class="viz-txt" x="6" y="52" font-family="JetBrains Mono,monospace" font-size="9" fill="#626d78">suggested</text>
+          <text class="viz-txt" x="123" y="52" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff6b7d" fill-opacity=".8">hard cap</text>
         </svg>
       </div>
     </div>
@@ -192,6 +192,75 @@
       <p class="beat" data-beat="3">That window is <em>the opportunity.</em></p>
     </div>
     <div class="scene-meter" aria-hidden="true"><i id="gapMeter"></i></div>
+  </div>
+</section>
+
+<!-- ══════════ HOW IT WORKS · STEPPER ══════════
+     Insert AFTER the closing </section> of the gap scene (data-scene="gap"),
+     immediately BEFORE the PROOF section comment. Needs index-sections.css. -->
+<section class="band step-band" id="how">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">How it works</p>
+      <h2 class="statement sm">From headline to sized position, in seconds.</h2>
+    </div>
+    <div class="step-strip">
+      <div class="card step-item rv">
+        <div class="step-top">
+          <div class="ico">01</div>
+          <svg class="step-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="2.4" fill="#4db5ff"/>
+            <path d="M8.2 15.8a5.4 5.4 0 0 1 0-7.6" fill="none" stroke="#4d8be0" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M15.8 8.2a5.4 5.4 0 0 1 0 7.6" fill="none" stroke="#4d8be0" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M5.4 18.6a9.4 9.4 0 0 1 0-13.2" fill="none" stroke="#4d8be0" stroke-opacity=".45" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18.6 5.4a9.4 9.4 0 0 1 0 13.2" fill="none" stroke="#4d8be0" stroke-opacity=".45" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>News breaks</h3>
+        <p>A headline hits the wire.</p>
+        <span class="step-link" aria-hidden="true"></span>
+      </div>
+      <div class="card step-item rv">
+        <div class="step-top">
+          <div class="ico">02</div>
+          <svg class="step-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="5.5" width="16" height="2" rx="1" fill="#2b343d"/>
+            <rect x="4" y="11" width="12.5" height="2" rx="1" fill="#4db5ff"/>
+            <rect x="4" y="16.5" width="8.5" height="2" rx="1" fill="#2b343d"/>
+            <path d="M17 18.5 L19.6 15.3 L22.2 18.5 Z" fill="#3ddc97"/>
+          </svg>
+        </div>
+        <h3>We read it</h3>
+        <p>Scored in seconds: which way it pushes prices, and how hard.</p>
+        <span class="step-link" aria-hidden="true"></span>
+      </div>
+      <div class="card step-item rv">
+        <div class="step-top">
+          <div class="ico">03</div>
+          <svg class="step-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="7.6" width="9" height="2.6" rx="1.3" fill="#626d78"/>
+            <rect x="4" y="13.8" width="14.5" height="2.6" rx="1.3" fill="#4db5ff"/>
+            <rect x="13" y="13.8" width="5.5" height="2.6" rx="1.3" fill="#3ddc97"/>
+          </svg>
+        </div>
+        <h3>We price it</h3>
+        <p>What it's worth, next to what the market is charging.</p>
+        <span class="step-link" aria-hidden="true"></span>
+      </div>
+      <div class="card step-item rv">
+        <div class="step-top">
+          <div class="ico">04</div>
+          <svg class="step-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4.5" y="10.7" width="15" height="2.6" rx="1.3" fill="#181d24" stroke="#2b343d"/>
+            <rect x="4.5" y="10.7" width="6.5" height="2.6" rx="1.3" fill="#3ddc97"/>
+            <rect x="14.2" y="8.6" width="1.5" height="6.8" rx=".75" fill="#ff6b7d"/>
+          </svg>
+        </div>
+        <h3>You size it</h3>
+        <p>A suggested stake, capped so one bad call can't hurt you.</p>
+      </div>
+    </div>
+    <p class="fine rv">That's the whole pipeline in plain English. <a href="methodology.html">Read the full methodology →</a></p>
   </div>
 </section>
 
@@ -256,6 +325,44 @@
   </div>
 </section>
 
+<!-- ══════════ HONEST BY DESIGN ══════════
+     Insert AFTER the closing </section> of the live/wire section (id="live"),
+     immediately BEFORE the PRICING section comment. Needs index-sections.css. -->
+<section class="band hb-band" id="honesty">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">House rules</p>
+      <h2 class="statement sm">Honest by design.</h2>
+    </div>
+    <div class="hb-panel rv">
+      <div class="hb-item">
+        <div class="hb-top" aria-hidden="true">
+          <span class="badge-sample">SNAPSHOT</span>
+          <span class="badge-sample">EXAMPLE</span>
+          <span class="badge-sample">VALIDATION RUN</span>
+        </div>
+        <h3>Labeled, always</h3>
+        <p>Anything that isn't live data says so, right where you're looking.</p>
+      </div>
+      <div class="hb-item">
+        <div class="hb-top" aria-hidden="true">
+          <span class="hb-pill"><span class="hb-dot"></span>STANDBY</span>
+        </div>
+        <h3>Standby, never stories</h3>
+        <p>When a feed dies you see standby, never made-up headlines.</p>
+      </div>
+      <div class="hb-item">
+        <div class="hb-top" aria-hidden="true">
+          <span class="hb-sum">news + history + market <b>= price</b></span>
+        </div>
+        <h3>No black box</h3>
+        <p>Every price breaks into named parts, and the parts add up exactly.</p>
+      </div>
+    </div>
+    <p class="fine rv">Rules, not promises; they're built into the product. <a href="methodology.html">See how →</a></p>
+  </div>
+</section>
+
 <!-- ══════════ PRICING ══════════ -->
 <section class="band" id="pricing">
   <div class="wrap">
@@ -269,7 +376,7 @@
       <div class="price-card rv">
         <h3>Basic</h3>
         <p class="who">If you trade your own money and want a clear call.</p>
-        <div class="amt">$20<small>/month</small></div>
+        <div class="amt">$12<small>/month</small></div>
         <p class="trial">14 days free</p>
         <ul>
           <li><b>The call</b>: buy, sell or sit out, on every market</li>
@@ -283,9 +390,10 @@
 
       <div class="price-card feat rv">
         <span class="ribbon">Most popular</span>
+        <span class="price-sheen" aria-hidden="true"></span>
         <h3>Pro</h3>
         <p class="who">If you trade seriously and need to see the workings.</p>
-        <div class="amt">$99<small>/month</small></div>
+        <div class="amt">$39<small>/month</small></div>
         <p class="trial">14 days free</p>
         <ul>
           <li><b>Everything in Basic</b></li>
@@ -336,7 +444,7 @@
 </main>
 
 <footer>
-  <div class="wrap foot-inner">
+  <div class="wrap foot-inner rv">
     <div class="foot-brand">
       <span class="logo">resolv<span class="logo-dot"></span></span>
       <div class="foot-links">

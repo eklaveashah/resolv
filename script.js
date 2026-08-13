@@ -132,6 +132,9 @@ if ("IntersectionObserver" in window) {
   rvItems.forEach(el => io.observe(el));
 }
 setTimeout(() => rvItems.forEach(el => el.classList.add("in")), 2600);   // failsafe
+/* card-visual choreography failsafe: if the animation engine never ran
+   (background tab at load), force the final drawn state after 6s */
+setTimeout(() => document.querySelectorAll(".vcard").forEach(el => el.classList.add("viz-done")), 6000);
 
 /* ---------------- canvas sizing ---------------- */
 const canvases = [];
@@ -681,6 +684,7 @@ document.querySelectorAll("[data-count]").forEach(el => {
       /* markets first, so the impact panel renders against live rows */
       if (feed.markets && feed.markets.length) applyLiveMarkets(feed.markets, feed.stale, feed.ageSeconds);
       renderRows();
+      const fr = $("feedRows"); fr.classList.add("wire-fresh"); clearTimeout(fr._wf); fr._wf = setTimeout(() => fr.classList.remove("wire-fresh"), 900);
       renderImpact(items[selIdx]);
       if (feed.stale) setFeedStatus("standby", "CACHED · " + agoLabel(feed.ageSeconds));
       else setFeedStatus("live", "LIVE · " + items.length + " HEADLINES");
@@ -888,18 +892,37 @@ document.querySelectorAll("[data-count]").forEach(el => {
   draw();
 })();
 
-/* ---- hero card 3D tilt (pointer devices, motion-OK only) ---- */
+/* ---- hero card 3D tilt (pointer devices, motion-OK only) ----
+   Spring-follow rather than a CSS transition: the card tracks the
+   pointer with no lag-feel, every new move simply re-targets the
+   spring, and release settles from the current on-screen value.
+   Critically damped (no overshoot): nothing was flicked. */
 (function tilt() {
   const shell = $("heroTilt");
   if (!shell || RM || !matchMedia("(hover:hover)").matches) return;
-  shell.style.transition = "transform .18s ease-out";
+  let tx = 0, ty = 0;      // target rotation (deg)
+  let cx = 0, cy = 0;      // presentation rotation: what is on screen right now
+  let raf = 0;
+  function step() {
+    cx += (tx - cx) * .18;
+    cy += (ty - cy) * .18;
+    if (Math.abs(tx - cx) < .02 && Math.abs(ty - cy) < .02) {
+      cx = tx; cy = ty; raf = 0;
+      shell.style.transform = (tx === 0 && ty === 0) ? "" :
+        `perspective(950px) rotateX(${cy.toFixed(2)}deg) rotateY(${cx.toFixed(2)}deg)`;
+      return;
+    }
+    shell.style.transform = `perspective(950px) rotateX(${cy.toFixed(3)}deg) rotateY(${cx.toFixed(3)}deg)`;
+    raf = requestAnimationFrame(step);
+  }
+  const kick = () => { if (!raf) raf = requestAnimationFrame(step); };
   shell.addEventListener("pointermove", e => {
     const r = shell.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - .5;
-    const py = (e.clientY - r.top) / r.height - .5;
-    shell.style.transform = `perspective(950px) rotateX(${(-py * 6).toFixed(2)}deg) rotateY(${(px * 8).toFixed(2)}deg)`;
+    tx = ((e.clientX - r.left) / r.width - .5) * 8;
+    ty = -((e.clientY - r.top) / r.height - .5) * 6;
+    kick();
   });
-  shell.addEventListener("pointerleave", () => { shell.style.transform = ""; });
+  shell.addEventListener("pointerleave", () => { tx = 0; ty = 0; kick(); });
 })();
 
 /* ---- cursor-tracking glow borders on surfaces ---- */
