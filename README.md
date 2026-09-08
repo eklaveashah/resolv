@@ -209,3 +209,17 @@ only runs the parts it actually has.
 - Pricing is a 14-day free trial with no card, then $12 Basic / $39 Pro / custom
   Desk. The same figures appear in `../Prototype/Resolv Terminal.html`
   - keep them in sync if you change them.
+
+## Working on the site with Claude
+
+`.claude/settings.json` registers the
+[watermarks-remover](https://github.com/guillaumemeyer/watermarks-remover)
+plugin marketplace and enables its plugin, so a Claude Code session in this repo
+picks up the `remove-ai-marks` and `clean-user-facing-text` skills plus a
+post-write hook that flags invisible Unicode and C2PA/AI metadata in files it
+writes. `remove-ai-marks` needs the upstream HTTP service running;
+`clean-user-facing-text` doesn't. Setup, the pinned version, and how to bump it
+are in [`.claude/README.md`](.claude/README.md).
+
+`.claude/` is developer config - it holds no secrets and doesn't need to go on
+the server, though it's harmless if it does (`robots.txt` keeps crawlers out).
