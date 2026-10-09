@@ -9,17 +9,17 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-tHd4qJ0R/vQfI0CbRTiL3XGSi+Tun7VhOcDbx08aLKA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.gdeltproject.org; base-uri 'none'; form-action 'self'; object-src 'none'; frame-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Resolv · The Intelligence Layer for Prediction Markets</title>
-<meta name="description" content="Resolv reads the news wire across Kalshi and Polymarket, works out what each story means for every open contract, and shows you where the evidence and the market disagree. 14 days free.">
+<meta name="description" content="Explore selected Kalshi and Polymarket contracts, timestamped news, and transparent research tools. No account required.">
 <meta name="theme-color" content="#07090b">
 <link rel="canonical" href="https://resolvterminal.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Resolv">
 <meta property="og:title" content="Resolv · The Intelligence Layer for Prediction Markets">
-<meta property="og:description" content="Every headline, every contract, one screen. See what the evidence says, and where the market disagrees.">
+<meta property="og:description" content="Selected markets, current headlines, and transparent research tools in one screen.">
 <meta property="og:url" content="https://resolvterminal.com/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Resolv · The Intelligence Layer for Prediction Markets">
-<meta name="twitter:description" content="Every headline, every contract, one screen. See what the evidence says, and where the market disagrees.">
+<meta name="twitter:description" content="Selected markets, current headlines, and transparent research tools in one screen.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307090b'/%3E%3Ccircle cx='11' cy='12' r='4' fill='%23bd8a10'/%3E%3Ccircle cx='22' cy='20' r='3' fill='%234db5ff'/%3E%3Cpath d='M11 12 L22 20' stroke='%23e05a6d' stroke-width='1.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,15 +62,15 @@
   <canvas id="heroBg" class="hero-bg" aria-hidden="true"></canvas>
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="eyebrow fade-1">Every headline · Every contract</p>
+      <p class="eyebrow fade-1">Market quotes · News · Research</p>
       <h1 class="display">
         <span class="line"><span class="w">The</span> <span class="w">intelligence</span> <span class="w">layer</span></span>
         <span class="line"><span class="w">for</span> <span class="w accent">prediction</span> <span class="w accent">markets.</span></span>
       </h1>
-      <p class="hero-sub fade-2">Hundreds of headlines a day, hundreds of open contracts, and no way to read them all. Resolv gathers the news from everywhere, works out what each story means for every contract, and shows you where the evidence and the market disagree.</p>
+      <p class="hero-sub fade-2">Explore selected Kalshi and Polymarket contracts alongside current business headlines. Compare quotes, inspect research estimates, and track a paper portfolio. Every feed shows its status; predictive performance is still under validation.</p>
       <div class="btn-row fade-3">
         <a class="btn primary lg" href="terminal.html#app">Open the terminal</a>
-        <a class="btn lg ghost" href="#what" data-terminal-link>Open research terminal</a>
+        <a class="btn lg ghost" href="#live">Explore the live data</a>
       </div>
       <p class="hero-note fade-3">
         <span class="live-pill" id="heroLive"><span class="hp-dot"></span>NEWS WIRE · CONNECTING</span>
@@ -121,7 +121,7 @@
     <div class="strip-item rv"><b class="accent">2</b><span>exchanges in one place</span></div>
     <div class="strip-item rv"><b class="up">Every ~10 min</b><span>prices and news refreshed</span></div>
     <div class="strip-item rv"><b>5</b><span>reasons behind every call</span></div>
-    <div class="strip-item rv"><b class="warn">14 days</b><span>free, no card</span></div>
+    <div class="strip-item rv"><b class="warn">Open beta</b><span>no account required</span></div>
   </div>
 </section>
 
@@ -130,7 +130,7 @@
   <div class="wrap">
     <div class="section-head rv">
       <p class="kicker">What it does</p>
-      <h2 class="statement sm">Three things, every minute.</h2>
+      <h2 class="statement sm">Three tools for your research.</h2>
     </div>
     <div class="cards3">
       <div class="card vcard rv">
@@ -152,7 +152,7 @@
       <div class="card vcard rv">
         <div class="ico">02</div>
         <h3>Works out what it means</h3>
-        <p>Each headline is scored and matched to the contracts it actually bears on, so what you get is the reasoning, not just a number. If we can't point to a reason, we don't make a call.</p>
+        <p>Explore keyword matches and headline tone as research context. A topic match does not establish how a story changes the probability of a contract.</p>
         <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
           <g stroke="#e05a6d" stroke-opacity=".55" stroke-width="1.4" class="viz-links">
             <path pathLength="1" d="M110 28 L34 12"/><path pathLength="1" d="M110 28 L52 46"/><path pathLength="1" d="M110 28 L176 10"/><path pathLength="1" d="M110 28 L188 42"/>
@@ -188,7 +188,7 @@
     </div>
     <div class="scene-copy">
       <p class="beat" data-beat="0">News breaks.</p>
-      <p class="beat" data-beat="1">Resolv reads it <em>in seconds.</em></p>
+      <p class="beat" data-beat="1">Resolv gathers it <em>on the next update.</em></p>
       <p class="beat" data-beat="2">The price takes time to catch up.</p>
       <p class="beat" data-beat="3">That lag is <em>what we watch for.</em></p>
     </div>
@@ -203,7 +203,7 @@
   <div class="wrap">
     <div class="section-head rv">
       <p class="kicker">How it works</p>
-      <h2 class="statement sm">From headline to sized position, in seconds.</h2>
+      <h2 class="statement sm">From current quotes to a research scenario.</h2>
     </div>
     <div class="step-strip">
       <div class="card step-item rv">
@@ -232,7 +232,7 @@
           </svg>
         </div>
         <h3>We read it</h3>
-        <p>Scored in seconds: which way it pushes prices, and how hard.</p>
+        <p>Inspect the source and topic. Generic news tone is not an outcome forecast.</p>
         <span class="step-link" aria-hidden="true"></span>
       </div>
       <div class="card step-item rv">
@@ -245,7 +245,7 @@
           </svg>
         </div>
         <h3>We price it</h3>
-        <p>What it's worth, next to what the market is charging.</p>
+        <p>Inspect a heuristic estimate beside the market quote; validated forecasts are a separate feature.</p>
         <span class="step-link" aria-hidden="true"></span>
       </div>
       <div class="card step-item rv">
@@ -306,18 +306,18 @@
       <div class="proof-chart rv">
         <div class="pc-head">
           <b>When we say 70%, does it happen 70% of the time?</b>
-          <span class="badge-sample">VALIDATION RUN</span>
+          <span class="badge-sample">ILLUSTRATION ONLY</span>
         </div>
-        <canvas id="calChart" aria-label="Chart comparing forecast probability to how often those events actually happened; points sit close to the perfect-calibration line"></canvas>
-        <p class="pc-note">Each dot is a group of forecasts. The closer to the line, the better calibrated. Off the line means we were over- or under-confident.</p>
+        <canvas id="calChart" aria-label="Illustration of calibration concepts, not measured model performance"></canvas>
+        <p class="pc-note">This diagram explains calibration; its curves are illustrative. Actual model results must come from held-out resolved events.</p>
       </div>
       <div class="proof-stats">
-        <div class="pstat rv"><b class="mono" data-count="73" data-suffix="%">0</b><span>of our confident calls landed on the right side in validation</span></div>
+        <div class="pstat rv"><b class="mono">Pending</b><span>no live model has passed the deployment gates</span></div>
         <div class="pstat rv"><b class="mono">4<span class="dim">pt</span></b><span>minimum edge before we'll call anything; below that, we stay quiet</span></div>
         <div class="pstat rv"><b class="mono">15<span class="dim">%</span></b><span>hard ceiling on any position, no matter how good it looks</span></div>
       </div>
     </div>
-    <p class="fine rv">Figures from our current validation run on sample history, not a live track record; we'll publish live results as they accumulate. <a href="methodology.html#calibration">How we measure this →</a></p>
+    <p class="fine rv">The first real-data candidate failed the market-baseline and event-coverage gates. The diagram is illustrative and the thresholds are research settings, not evidence of predictive performance. <a href="methodology.html#calibration">How we measure this →</a></p>
   </div>
 </section>
 
@@ -327,7 +327,7 @@
     <div class="section-head rv">
       <p class="kicker">Live data</p>
       <h2 class="statement sm">News breaks. We read it.</h2>
-      <p class="lede">Real headlines, loading in your browser as you read, each one scored for direction and mapped to the contracts it touches. Pick any headline to see our read.</p>
+      <p class="lede">Current business headlines with source links and topic matches. Quotes and news are polled approximately every ten minutes; refreshes can be delayed. Headline tone is exploratory context, not a trading signal.</p>
     </div>
     <div class="wire rv">
       <div class="feed">
@@ -369,7 +369,7 @@
         <div class="hb-top" aria-hidden="true">
           <span class="badge-sample">SNAPSHOT</span>
           <span class="badge-sample">EXAMPLE</span>
-          <span class="badge-sample">VALIDATION RUN</span>
+          <span class="badge-sample">ILLUSTRATION ONLY</span>
         </div>
         <h3>Labeled, always</h3>
         <p>Anything that isn't live data says so, right where you're looking.</p>
@@ -419,7 +419,7 @@
       </div>
 
       <div class="price-card feat rv">
-        <span class="ribbon">Most popular</span>
+        <span class="ribbon">Research tools</span>
         <span class="price-sheen" aria-hidden="true"></span>
         <h3>Pro</h3>
         <p class="who">If you trade seriously and need to see the workings.</p>
@@ -462,8 +462,8 @@
 <!-- ══════════ CTA ══════════ -->
 <section class="band cta-band" id="access">
   <div class="wrap">
-    <h2 class="statement center rv">Start free.</h2>
-    <p class="cta-sub rv">Private beta. Request an invitation; no payment is collected.</p>
+    <h2 class="statement center rv">Explore the beta.</h2>
+    <p class="cta-sub rv">The research terminal is open. Online access requests will become available when a signup service is configured.</p>
     <form class="wait-form rv" id="waitForm" novalidate>
       <input type="email" id="waitEmail" placeholder="you@email.com" aria-label="Email address" autocomplete="email" maxlength="254" spellcheck="false" required>
       <button class="btn primary" type="submit" id="waitBtn">Get access</button>

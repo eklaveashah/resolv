@@ -595,7 +595,7 @@ document.querySelectorAll("[data-count]").forEach(el => {
       return `<div class="feed-row ${a.tone >= 0 ? "tone-up" : "tone-down"}${i === selIdx ? " sel" : ""}" data-i="${i}" tabindex="0" role="button" aria-pressed="${i === selIdx}"><div style="min-width:0">
         <${tag}${href} class="ft">${esc(a.title)}</${tag}>
         <div class="fm">${esc(a.domain)} · <span class="ago">${esc(timeAgo(a.ts))}</span></div>
-        <span class="cat-chip">affects · ${esc(a.cat)}</span>
+        <span class="cat-chip">topic · ${esc(a.cat)}</span>
       </div><div class="fs ${a.tone >= 0 ? "up" : "down"}">${a.tone >= 0 ? "+" : ""}${a.tone.toFixed(2)}</div></div>`;
     }).join("");
     [...$("feedRows").children].forEach(row => {
@@ -619,21 +619,20 @@ document.querySelectorAll("[data-count]").forEach(el => {
     const pos = a.tone >= 0;
     const pct = Math.round(((a.tone + 1) / 2) * 100);
     const pool = marketRows();
-    const rel = pool.filter(m => m.cat === a.cat).slice(0, 3);
-    const list = rel.length ? rel : pool.slice(0, 3);
+    const list = a.cat === "General" ? [] : pool.filter(m => m.cat === a.cat).slice(0, 3);
     const live = marketsAreLive();
     host.innerHTML = `
       <p class="imp-title">${esc(a.title)}</p>
       <div class="imp-meta">${esc(a.domain)} · ${esc(timeAgo(a.ts))}</div>
       <div class="imp-label">Our read of the headline</div>
       <div class="tone-meter"><i class="tm-needle" style="left:${pct}%"></i></div>
-      <div class="tm-legend"><span>negative</span><b class="${pos ? "up" : "down"}">reads ${pos ? "positive" : "negative"} · ${pos ? "+" : ""}${a.tone.toFixed(2)}</b><span>positive</span></div>
-      <div class="imp-label">Contracts this kind of story touches <span class="imp-cat">${esc(a.cat)}</span></div>
-      ${list.map(m => `<div class="imp-row"><span class="imp-venue">${esc(m.v)}</span><span class="imp-q">${esc(m.q)}</span><b class="mono">${m.p}¢</b></div>`).join("")}
+      <div class="tm-legend"><span>negative</span><b class="${pos ? "up" : "down"}">reads ${a.tone === 0 ? "neutral" : pos ? "positive" : "negative"} · ${pos ? "+" : ""}${a.tone.toFixed(2)}</b><span>positive</span></div>
+      <div class="imp-label">Same-topic contracts · unverified relevance <span class="imp-cat">${esc(a.cat)}</span></div>
+      ${!list.length ? "<p>No specific contract match established.</p>" : ""}${list.map(m => `<div class="imp-row"><span class="imp-venue">${esc(m.v)}</span><span class="imp-q">${esc(m.q)}</span><b class="mono">${m.p}¢</b></div>`).join("")}
       <p class="imp-note">${live
-        ? "Live headline, live contract prices. In the product this becomes a priced call: fair value, gap, and stake."
-        : "Live headline, sample contracts. In the product this becomes a priced call: fair value, gap, and stake."}</p>
-      <a class="btn sm" href="#access">Get the live version</a>`;
+        ? "Current quotes. A shared topic is not evidence that this headline changes the outcome. No directional forecast is inferred."
+        : "Sample contracts for illustration. No directional forecast is inferred."}</p>
+      <a class="btn sm" href="terminal.html#app">Open research terminal</a>`;
     host.classList.remove("flash");
     void host.offsetWidth;   // restart the update flash
     host.classList.add("flash");
@@ -743,7 +742,7 @@ document.querySelectorAll("[data-count]").forEach(el => {
       const fr = $("feedRows"); fr.classList.add("wire-fresh"); clearTimeout(fr._wf); fr._wf = setTimeout(() => fr.classList.remove("wire-fresh"), 900);
       renderImpact(items[selIdx]);
       if (feed.stale) setFeedStatus("standby", "CACHED · " + agoLabel(feed.ageSeconds));
-      else setFeedStatus("live", "LIVE · " + items.length + " HEADLINES");
+      else setFeedStatus("live", (LOCAL_WORKSPACE ? "LIVE · " : "POLLED · ") + items.length + " HEADLINES");
     } catch (err) {
       if (seq !== loadSeq) return;   // superseded - a newer load owns the UI
       console.warn("[resolv] wire fetch failed:", err);   // diagnostics - the UI below stays honest
