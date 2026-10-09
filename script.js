@@ -3,29 +3,53 @@
    RESOLV - shared script for index.html and methodology.html
    Every block is guarded, so each page only runs what it has.
    -------------------------------------------------------------
-   CONFIG: set these two before deploying.
-     CONTACT_EMAIL     - where "Start free" signups go.
-     WAITLIST_ENDPOINT - optional POST URL (Formspree, Buttondown,
-       your own API). If empty, addresses are captured to the
-       visitor's localStorage (see the LAUNCH BLOCKER note in the
-       signup block). When you set it, ALSO add its origin to the
-       CSP connect-src in index.html, methodology.html and _headers,
-       or the browser will block the POST. The form NEVER claims
-       success unless the request actually succeeded.
+   CONFIG
+     API_ORIGIN - the hosted Resolv service, for example
+       "https://api.resolvterminal.com". Leave it empty until that
+       service is running and its DNS resolves: a dead origin here would
+       break signups on the public site. When you set it, ALSO add the
+       origin to connect-src in index.html, methodology.html, 404.html
+       and _headers, or the browser will block every call to it.
+     CONTACT_EMAIL - empty on purpose. The old hello@resolv.trade is on a
+       domain that does not exist, so nothing displays an address. Set a
+       working inbox here (and in USER_AGENT in
+       MLModel/resolv_ml/config.py) before any address is shown.
+   Read from the page:
+     WORKSPACE_MODE - <meta name="resolv-workspace"> is injected only by
+       a Resolv server: "connected" on the local workspace, "hosted" on
+       the hosted service. Those pages call their own origin, so API_BASE
+       is "" there.
+   Derived:
+     WAITLIST_ENDPOINT - POST {email, source}. Empty means pre-launch:
+       the form keeps the address in this browser only and says that
+       nothing was sent. The form NEVER claims success unless the
+       request actually succeeded.
+     FEED_PROXY - one cached call that returns news plus market quotes
+       with per-source health. Empty means the page fetches GDELT news
+       straight from the visitor's browser (no market quotes).
    ============================================================= */
-const CONTACT_EMAIL = "hello@resolv.trade";
-const WAITLIST_ENDPOINT = "";   // e.g. "https://formspree.io/f/xxxxxxx"
+const API_ORIGIN = "";
+const CONTACT_EMAIL = "";   // TODO founder: set a working address; hello@resolv.trade does not resolve
+const WORKSPACE_MODE = (() => {
+  const m = document.querySelector('meta[name="resolv-workspace"]');
+  const v = m ? String(m.getAttribute("content") || "").trim().toLowerCase() : "";
+  return v === "connected" || v === "hosted" ? v : "";
+})();
+const LOCAL_WORKSPACE = WORKSPACE_MODE === "connected";
+const API_BASE = WORKSPACE_MODE ? "" : API_ORIGIN.replace(/\/+$/, "");
+const HAS_API = !!WORKSPACE_MODE || !!API_BASE;
+const WAITLIST_ENDPOINT = HAS_API ? API_BASE + "/api/waitlist" : "";
+const FEED_PROXY = HAS_API ? API_BASE + "/api/feed" : "data/feed.json";
+const MODEL_STATUS_URL = HAS_API ? API_BASE + "/api/model" : "";
 
-/* FEED_PROXY - URL of the Resolv feed Worker (see worker/README.md).
-   Leave empty and the page fetches GDELT straight from the visitor's
-   browser, which works but breaks for anyone on a rate-limited or shared
-   IP, and can never reach Kalshi or Polymarket because those calls are
-   blocked by CORS or by our own CSP.
-   Set it to your deployed Worker URL and you get live news AND live market
-   prices, cached once per minute for every visitor at the same time.
-   When you set it, add its origin to connect-src in the CSP: index.html,
-   methodology.html and _headers. */
-const FEED_PROXY = "";   // e.g. "https://resolv-feed.yourname.workers.dev"
+/* The ten terminal views, in the terminal's own nav order. Links are
+   /terminal#app/<key>; they are shown only in the connected workspace,
+   where /terminal exists on the same origin. */
+const TERMINAL_VIEWS = [
+  ["briefing", "Briefing"], ["markets", "Markets"], ["news", "News wire"],
+  ["evidence", "Evidence"], ["model", "Model"], ["sim", "Simulation"],
+  ["sizing", "Sizing"], ["arb", "Cross-venue"], ["watch", "Watchlist"], ["port", "Portfolio"]
+];
 
 /* ---------------- utils ---------------- */
 const $ = id => document.getElementById(id);
@@ -58,9 +82,11 @@ const SAMPLE_MARKETS = [
   { v: "POLYMARKET", q: "US GDP > 2% IN 2026", p: 58, d: 1, cat: "Economy" }
 ];
 
-/* Filled in only when the feed Worker returns real market prices. Until then
-   it stays empty and every market surface keeps its SAMPLE label. */
+/* Filled in only when the feed returns real exchange quotes. Until then it
+   stays empty and every market surface keeps its SAMPLE label. LIVE_FRESH
+   is false when those quotes are a retained copy (the source is stale). */
 let LIVE_MARKETS = [];
+let LIVE_FRESH = false;
 const marketRows = () => (LIVE_MARKETS.length ? LIVE_MARKETS : SAMPLE_MARKETS);
 const marketsAreLive = () => LIVE_MARKETS.length > 0;
 
@@ -175,6 +201,11 @@ function sizeAll() { canvases.forEach(o => { o.size(); o.redraw && o.redraw(); }
     const X = f => L + f * (R - L);
     const Y = v => B - ((v - .36) / .32) * (B - T);
 
+    // A drawn concept, not a market: say so on the chart itself.
+    ctx.font = "600 10px ui-monospace, monospace";
+    ctx.fillStyle = "rgba(245,196,81,.72)"; ctx.textAlign = "right";
+    ctx.fillText("ILLUSTRATIVE", R, T - 16);
+
     ctx.font = "10px ui-monospace, monospace";
     ctx.strokeStyle = "#1a212a"; ctx.lineWidth = 1; ctx.fillStyle = "#3a434c";
     for (let v = .40; v <= .6801; v += .08) {
@@ -238,17 +269,18 @@ function sizeAll() { canvases.forEach(o => { o.size(); o.redraw && o.redraw(); }
 })();
 
 /* =============================================================
-   CALIBRATION CHART - forecast vs what actually happened
-   Fixed validation figures, drawn once (no animation needed).
+   CALIBRATION CHART - how to read one. ILLUSTRATIVE, NOT RESULTS.
+   No model has beaten the market on held-out data yet, so there are
+   no results to plot. This draws the perfect-calibration diagonal and
+   a smooth textbook curve for an overconfident forecaster. It has no
+   dots and no sample sizes on purpose, so it cannot pass for data.
+   Real points belong here only from a scored, held-out report.
    ============================================================= */
 (function calChart() {
   const cv = $("calChart");
   if (!cv) return;
-  // bin midpoint, observed rate, weight (sample size) - validation run
-  const BINS = [
-    [.08, .06, 42], [.18, .16, 61], [.28, .31, 78], [.38, .35, 96],
-    [.48, .50, 110], [.58, .61, 94], [.68, .66, 81], [.78, .81, 63], [.90, .88, 38]
-  ];
+  // overconfident forecaster: what happens moves only 60% as far from 50% as what it said
+  const overconfident = p => .5 + (p - .5) * .6;
   const c = trackCanvas(cv, () => draw());
   function draw() {
     const { ctx, W, H, DPR } = c;
@@ -269,20 +301,26 @@ function sizeAll() { canvases.forEach(o => { o.size(); o.redraw && o.redraw(); }
     ctx.beginPath(); ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(1), Y(1)); ctx.stroke();
     ctx.setLineDash([]);
     ctx.fillStyle = "rgba(154,164,174,.6)"; ctx.textAlign = "left";
-    ctx.fillText("perfect calibration", X(.10), Y(.70));   // empty upper-left, clear of the dots
+    ctx.fillText("perfect calibration", X(.10), Y(.70));   // empty upper-left, clear of the curve
 
-    // connecting path
+    // the gap between saying and happening, shaded
     ctx.beginPath();
-    BINS.forEach((b, i) => i ? ctx.lineTo(X(b[0]), Y(b[1])) : ctx.moveTo(X(b[0]), Y(b[1])));
-    ctx.strokeStyle = "rgba(77,181,255,.4)"; ctx.lineWidth = 1.6; ctx.stroke();
+    for (let p = 0; p <= 1.0001; p += .02) ctx.lineTo(X(p), Y(overconfident(p)));
+    for (let p = 1; p >= -.0001; p -= .02) ctx.lineTo(X(p), Y(p));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(245,196,81,.07)"; ctx.fill();
 
-    // dots sized by sample count
-    BINS.forEach(b => {
-      const r = 4 + Math.sqrt(b[2]) * .38;
-      ctx.beginPath(); ctx.arc(X(b[0]), Y(b[1]), r, 0, 7);
-      ctx.fillStyle = "rgba(77,181,255,.9)"; ctx.fill();
-      ctx.strokeStyle = "#07090b"; ctx.lineWidth = 2; ctx.stroke();
-    });
+    // the illustrative curve: a line, never data points
+    ctx.beginPath();
+    for (let p = 0; p <= 1.0001; p += .02) p ? ctx.lineTo(X(p), Y(overconfident(p))) : ctx.moveTo(X(p), Y(overconfident(p)));
+    ctx.strokeStyle = "rgba(245,196,81,.85)"; ctx.lineWidth = 2; ctx.lineJoin = "round"; ctx.stroke();
+    ctx.fillStyle = "rgba(245,196,81,.9)"; ctx.textAlign = "left";
+    ctx.fillText("↑ an overconfident forecaster", X(.6), Y(.4));   // empty lower-right, clear of both lines
+
+    // say what it is, on the chart itself
+    ctx.font = "600 10px ui-monospace, monospace";
+    ctx.fillStyle = "rgba(245,196,81,.72)"; ctx.textAlign = "left";
+    ctx.fillText("ILLUSTRATIVE · NOT RESULTS", L + 8, T + 12);
 
     ctx.fillStyle = "#626d78"; ctx.font = "11px Inter, sans-serif";
     ctx.textAlign = "right"; ctx.fillText("we said →", R, B + 32);
@@ -557,7 +595,7 @@ document.querySelectorAll("[data-count]").forEach(el => {
       return `<div class="feed-row ${a.tone >= 0 ? "tone-up" : "tone-down"}${i === selIdx ? " sel" : ""}" data-i="${i}" tabindex="0" role="button" aria-pressed="${i === selIdx}"><div style="min-width:0">
         <${tag}${href} class="ft">${esc(a.title)}</${tag}>
         <div class="fm">${esc(a.domain)} · <span class="ago">${esc(timeAgo(a.ts))}</span></div>
-        <span class="cat-chip">affects · ${esc(a.cat)}</span>
+        <span class="cat-chip">topic · ${esc(a.cat)}</span>
       </div><div class="fs ${a.tone >= 0 ? "up" : "down"}">${a.tone >= 0 ? "+" : ""}${a.tone.toFixed(2)}</div></div>`;
     }).join("");
     [...$("feedRows").children].forEach(row => {
@@ -581,21 +619,20 @@ document.querySelectorAll("[data-count]").forEach(el => {
     const pos = a.tone >= 0;
     const pct = Math.round(((a.tone + 1) / 2) * 100);
     const pool = marketRows();
-    const rel = pool.filter(m => m.cat === a.cat).slice(0, 3);
-    const list = rel.length ? rel : pool.slice(0, 3);
+    const list = a.cat === "General" ? [] : pool.filter(m => m.cat === a.cat).slice(0, 3);
     const live = marketsAreLive();
     host.innerHTML = `
       <p class="imp-title">${esc(a.title)}</p>
       <div class="imp-meta">${esc(a.domain)} · ${esc(timeAgo(a.ts))}</div>
       <div class="imp-label">Our read of the headline</div>
       <div class="tone-meter"><i class="tm-needle" style="left:${pct}%"></i></div>
-      <div class="tm-legend"><span>negative</span><b class="${pos ? "up" : "down"}">reads ${pos ? "positive" : "negative"} · ${pos ? "+" : ""}${a.tone.toFixed(2)}</b><span>positive</span></div>
-      <div class="imp-label">Contracts this kind of story touches <span class="imp-cat">${esc(a.cat)}</span></div>
-      ${list.map(m => `<div class="imp-row"><span class="imp-venue">${esc(m.v)}</span><span class="imp-q">${esc(m.q)}</span><b class="mono">${m.p}¢</b></div>`).join("")}
+      <div class="tm-legend"><span>negative</span><b class="${pos ? "up" : "down"}">reads ${a.tone === 0 ? "neutral" : pos ? "positive" : "negative"} · ${pos ? "+" : ""}${a.tone.toFixed(2)}</b><span>positive</span></div>
+      <div class="imp-label">Same-topic contracts · unverified relevance <span class="imp-cat">${esc(a.cat)}</span></div>
+      ${!list.length ? "<p>No specific contract match established.</p>" : ""}${list.map(m => `<div class="imp-row"><span class="imp-venue">${esc(m.v)}</span><span class="imp-q">${esc(m.q)}</span><b class="mono">${m.p}¢</b></div>`).join("")}
       <p class="imp-note">${live
-        ? "Live headline, live contract prices. In the product this becomes a priced call: fair value, gap, and stake."
-        : "Live headline, sample contracts. In the product this becomes a priced call: fair value, gap, and stake."}</p>
-      <a class="btn sm" href="#access">Get the live version</a>`;
+        ? "Current quotes. A shared topic is not evidence that this headline changes the outcome. No directional forecast is inferred."
+        : "Sample contracts for illustration. No directional forecast is inferred."}</p>
+      <a class="btn sm" href="terminal.html#app">Open research terminal</a>`;
     host.classList.remove("flash");
     void host.offsetWidth;   // restart the update flash
     host.classList.add("flash");
@@ -616,10 +653,21 @@ document.querySelectorAll("[data-count]").forEach(el => {
       if (res.status === 429) throw Object.assign(new Error("rate limited"), { rate: true });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const d = await res.json();
+      if (!LOCAL_WORKSPACE && d.feeds) {
+        const now=Date.now();
+        for (const key of Object.keys(d.feeds)) {
+          const src=d.feeds[key];
+          if(!src.fetchedAt || now-src.fetchedAt>900000) {src.stale=true;src.status=src.items.length?"stale":"unavailable";}
+        }
+        d.markets=(d.markets||[]).filter(m=>d.feeds[m.venue==="KALSHI"?"kalshi":"poly"]?.status==="live");
+        d.stale=d.feeds.news.status!=="live";
+        d.ageSeconds=d.feeds.news.fetchedAt?Math.round((now-d.feeds.news.fetchedAt)/1000):null;
+      }
       if (d.error) throw new Error(d.detail || d.error);
       return {
         articles: d.news || [],
         markets: d.markets || [],
+        marketsStale: d.sources && typeof d.sources.markets === "object" ? !!d.sources.markets.stale : false,
         stale: !!d.stale,
         ageSeconds: typeof d.ageSeconds === "number" ? d.ageSeconds : null
       };
@@ -640,17 +688,23 @@ document.querySelectorAll("[data-count]").forEach(el => {
       p: Math.round(Number(m.priceCents)),
       cat: categorize(m.question)
     })).filter(m => m.q && m.p > 0 && m.p < 100);
-    if (!mapped.length) return;
+    if (!mapped.length) {
+      LIVE_MARKETS = []; renderTape();
+      if($("tapeBadge")) $("tapeBadge").textContent = "SAMPLE";
+      if($("tapeNote")) $("tapeNote").textContent = "LIVE QUOTES UNAVAILABLE";
+      if($("impactBadge")) $("impactBadge").textContent = "SAMPLE MARKETS";
+      return;
+    }
     LIVE_MARKETS = mapped;
     renderTape();
     const badge = $("tapeBadge"), note = $("tapeNote"), ib = $("impactBadge");
     const fresh = !stale;
     if (badge) {
-      badge.textContent = fresh ? "LIVE" : "CACHED";
+      badge.textContent = fresh ? (LOCAL_WORKSPACE ? "LIVE" : "POLLED") : "CACHED";
       badge.classList.toggle("badge-live", fresh);
     }
     if (note) note.textContent = fresh
-      ? "REAL PRICES · " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      ? (LOCAL_WORKSPACE ? "REAL PRICES · " : "POLLED QUOTES · ~10 MIN UPDATES · ") + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       : "REAL PRICES · " + agoLabel(ageSeconds);
     if (ib) {
       ib.textContent = fresh ? "LIVE MARKETS" : "CACHED MARKETS";
@@ -672,6 +726,7 @@ document.querySelectorAll("[data-count]").forEach(el => {
       const feed = await fetchPayload(ctl.signal);
       if (seq !== loadSeq) return;
       const arts = feed.articles.filter(a => a && a.title).slice(0, FEED_SHOW);
+      applyLiveMarkets(feed.markets || [], feed.marketsStale || false, feed.ageSeconds);
       if (!arts.length) throw new Error("no articles");
       items = arts.map(a => {
         let ts = null;
@@ -682,12 +737,12 @@ document.querySelectorAll("[data-count]").forEach(el => {
       });
       selIdx = Math.min(selIdx, items.length - 1);
       /* markets first, so the impact panel renders against live rows */
-      if (feed.markets && feed.markets.length) applyLiveMarkets(feed.markets, feed.stale, feed.ageSeconds);
+      // Market source status is independent of news availability.
       renderRows();
       const fr = $("feedRows"); fr.classList.add("wire-fresh"); clearTimeout(fr._wf); fr._wf = setTimeout(() => fr.classList.remove("wire-fresh"), 900);
       renderImpact(items[selIdx]);
       if (feed.stale) setFeedStatus("standby", "CACHED · " + agoLabel(feed.ageSeconds));
-      else setFeedStatus("live", "LIVE · " + items.length + " HEADLINES");
+      else setFeedStatus("live", (LOCAL_WORKSPACE ? "LIVE · " : "POLLED · ") + items.length + " HEADLINES");
     } catch (err) {
       if (seq !== loadSeq) return;   // superseded - a newer load owns the UI
       console.warn("[resolv] wire fetch failed:", err);   // diagnostics - the UI below stays honest
@@ -750,26 +805,7 @@ document.querySelectorAll("[data-count]").forEach(el => {
     }
     emailIn.classList.remove("bad");
     if (!WAITLIST_ENDPOINT) {
-      /* Pre-launch capture: the address is stored in this browser and the
-         form confirms inline (no mail app).
-         ── LAUNCH BLOCKER ─────────────────────────────────────────────
-         Set WAITLIST_ENDPOINT before deploying. Until then, signups
-         exist only in each visitor's own localStorage - nothing reaches
-         you. Retrieve locally-saved ones from a visitor's console with:
-         JSON.parse(localStorage.getItem("resolv-waitlist"))          */
-      try {
-        const KEY = "resolv-waitlist";
-        let list;
-        try { list = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (_) { list = []; }
-        if (!Array.isArray(list)) list = [];
-        if (!list.includes(val) && list.length < 200) { list.push(val); localStorage.setItem(KEY, JSON.stringify(list)); }
-        msg.innerHTML = `<span class="up">✓ Recorded. You're on the list.</span> <span class="dim">We'll email ${esc(val)} when your access is ready.</span>`;
-        btn.textContent = "✓ Added";
-        setTimeout(() => { btn.textContent = "Get access"; }, 2600);
-        form.reset();
-      } catch (e) {
-        msg.innerHTML = `<span class="down">Couldn't save that here.</span> <a href="mailto:${CONTACT_EMAIL}">Email us</a> and we'll add you by hand.`;
-      }
+      msg.textContent = "Online signup is not connected yet. You can explore the terminal without an account.";
       return;
     }
     btn.disabled = true; btn.textContent = "Sending…";
@@ -780,12 +816,12 @@ document.querySelectorAll("[data-count]").forEach(el => {
         body: JSON.stringify({ email: val, source: "resolv-landing" })
       });
       if (!res.ok) throw new Error("HTTP " + res.status);
-      msg.innerHTML = `<span class="up">✓ Recorded. You're on the list.</span> <span class="dim">We'll email ${esc(val)} when your access is ready.</span>`;
+      msg.innerHTML = `<span class="up">✓ Access request saved.</span> <span class="dim">${LOCAL_WORKSPACE ? "Saved to this local Resolv server; email delivery is not configured." : "Your request reached the signup service."}</span>`;
       btn.textContent = "✓ Added";
       setTimeout(() => { btn.textContent = "Get access"; }, 2600);
       form.reset();
     } catch (err) {
-      msg.innerHTML = `<span class="down">That didn't go through.</span> <a href="mailto:${CONTACT_EMAIL}">Email us</a> and we'll set you up.`;
+      msg.textContent = "Your request could not be saved. Please try again later.";
     } finally { btn.disabled = false; if (btn.textContent === "Sending…") btn.textContent = "Get access"; }
   });
   emailIn.addEventListener("input", () => {
@@ -956,3 +992,14 @@ renderTape();
 /* ---------------- initial paint ---------------- */
 sizeAll();
 updateScroll();
+
+// Local workspace entry points are visible only when the service is present.
+if (LOCAL_WORKSPACE) {
+  document.querySelectorAll('[data-terminal-link]').forEach(a=>{a.href='/terminal#app';a.hidden=false;});
+  const banner=document.createElement('div');
+  banner.className='workspace-banner';
+  banner.innerHTML='<span class="workspace-dot"></span><b>Your Resolv workspace</b><span>Live market research · paper portfolio · model validation</span><a href="/terminal#app">Open terminal ↗</a>';
+  document.querySelector('main')?.prepend(banner);
+}
+
+if(!LOCAL_WORKSPACE) document.querySelectorAll('[data-terminal-link]').forEach(a=>{a.href='terminal.html#app';a.textContent='Open research terminal';});

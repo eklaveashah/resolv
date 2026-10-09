@@ -9,17 +9,17 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-tHd4qJ0R/vQfI0CbRTiL3XGSi+Tun7VhOcDbx08aLKA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.gdeltproject.org; base-uri 'none'; form-action 'self'; object-src 'none'; frame-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Resolv · The Intelligence Layer for Prediction Markets</title>
-<meta name="description" content="Resolv finds mispriced event contracts across Kalshi and Polymarket, shows you why they're mispriced, and tells you how much to risk. 14 days free.">
+<meta name="description" content="Explore selected Kalshi and Polymarket contracts, timestamped news, and transparent research tools. No account required.">
 <meta name="theme-color" content="#07090b">
 <link rel="canonical" href="https://resolvterminal.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Resolv">
 <meta property="og:title" content="Resolv · The Intelligence Layer for Prediction Markets">
-<meta property="og:description" content="Find mispriced event contracts. See why. Know how much to risk.">
+<meta property="og:description" content="Selected markets, current headlines, and transparent research tools in one screen.">
 <meta property="og:url" content="https://resolvterminal.com/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Resolv · The Intelligence Layer for Prediction Markets">
-<meta name="twitter:description" content="Find mispriced event contracts. See why. Know how much to risk.">
+<meta name="twitter:description" content="Selected markets, current headlines, and transparent research tools in one screen.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307090b'/%3E%3Ccircle cx='11' cy='12' r='4' fill='%23bd8a10'/%3E%3Ccircle cx='22' cy='20' r='3' fill='%234db5ff'/%3E%3Cpath d='M11 12 L22 20' stroke='%23e05a6d' stroke-width='1.6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +43,7 @@
       <a href="#live">Live data</a>
       <a href="#pricing">Pricing</a>
       <a href="methodology.html">Methodology</a>
-      <a class="btn primary sm" href="#access">Start free</a>
+      <a class="btn primary sm" href="#access">Request beta access</a>
     </div>
     <button class="navtoggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
   </div>
@@ -51,7 +51,7 @@
 <div class="mobilemenu" id="mobileMenu">
   <a href="#what">What it does</a><a href="#proof">Proof</a><a href="#live">Live data</a>
   <a href="#pricing">Pricing</a><a href="methodology.html">Methodology</a>
-  <a class="btn primary" href="#access">Start free</a>
+  <a class="btn primary" href="#access">Request beta access</a>
 </div>
 
 <main id="main">
@@ -62,19 +62,19 @@
   <canvas id="heroBg" class="hero-bg" aria-hidden="true"></canvas>
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="eyebrow fade-1">News in · Edge out</p>
+      <p class="eyebrow fade-1">Market quotes · News · Research</p>
       <h1 class="display">
         <span class="line"><span class="w">The</span> <span class="w">intelligence</span> <span class="w">layer</span></span>
         <span class="line"><span class="w">for</span> <span class="w accent">prediction</span> <span class="w accent">markets.</span></span>
       </h1>
-      <p class="hero-sub fade-2">Rates, elections, crypto, sports: every one of those markets moves on news. Resolv reads the wire the second it breaks, and it's the first to tell you which contracts are priced wrong, why, and how much to put behind it.</p>
+      <p class="hero-sub fade-2">Explore selected Kalshi and Polymarket contracts alongside current business headlines. Compare quotes, inspect research estimates, and track a paper portfolio. Every feed shows its status; predictive performance is still under validation.</p>
       <div class="btn-row fade-3">
-        <a class="btn primary lg" href="#access">Start 14 days free</a>
-        <a class="btn lg ghost" href="#what">See what it does</a>
+        <a class="btn primary lg" href="terminal.html#app">Open the terminal</a>
+        <a class="btn lg ghost" href="#live">Explore the live data</a>
       </div>
       <p class="hero-note fade-3">
         <span class="live-pill" id="heroLive"><span class="hp-dot"></span>NEWS WIRE · CONNECTING</span>
-        <span class="hero-note-txt">No card required</span>
+        <span class="hero-note-txt">No account required for the research terminal</span>
       </p>
     </div>
 
@@ -99,10 +99,11 @@
         <div class="hc-meta"><b class="up mono">+5¢</b> underpriced · <b class="mono">73%</b> confident</div>
       </div>
       <div class="hc-foot">
-        <span>Suggested stake</span>
+        <span>Risk ceiling</span>
         <b class="mono">3.5% of bankroll</b>
       </div>
     </div>
+    <p class="micro hero-disclaim">Example output. Resolv is analysis, not advice: we never place a trade, and the ceiling is a limit from a fixed formula, not an instruction.</p>
     </div>
   </div>
   <div class="scroll-cue fade-3" aria-hidden="true"><span class="cue-line"></span></div>
@@ -118,9 +119,9 @@
 <section class="strip">
   <div class="wrap strip-grid">
     <div class="strip-item rv"><b class="accent">2</b><span>exchanges in one place</span></div>
-    <div class="strip-item rv"><b class="up">Every 90s</b><span>prices and news refreshed</span></div>
+    <div class="strip-item rv"><b class="up">Every ~10 min</b><span>prices and news refreshed</span></div>
     <div class="strip-item rv"><b>5</b><span>reasons behind every call</span></div>
-    <div class="strip-item rv"><b class="warn">14 days</b><span>free, no card</span></div>
+    <div class="strip-item rv"><b class="warn">Open beta</b><span>no account required</span></div>
   </div>
 </section>
 
@@ -129,13 +130,13 @@
   <div class="wrap">
     <div class="section-head rv">
       <p class="kicker">What it does</p>
-      <h2 class="statement sm">Three things, every minute.</h2>
+      <h2 class="statement sm">Three tools for your research.</h2>
     </div>
     <div class="cards3">
       <div class="card vcard rv">
         <div class="ico">01</div>
-        <h3>Finds the mispriced ones</h3>
-        <p>We watch every open contract on both exchanges and flag the ones trading away from what the evidence says they're worth.</p>
+        <h3>Brings the market into focus</h3>
+        <p>A selected set of public contracts and current business headlines in one place, with timestamps and clear source health.</p>
         <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
           <g fill="#2b343d" class="viz-bars">
             <rect x="6"   y="30" width="9" height="20" rx="2"/><rect x="24"  y="24" width="9" height="26" rx="2"/>
@@ -150,8 +151,8 @@
       </div>
       <div class="card vcard rv">
         <div class="ico">02</div>
-        <h3>Shows you why</h3>
-        <p>Every call comes with the headlines and numbers behind it. If we can't point to a reason, we don't make the call.</p>
+        <h3>Works out what it means</h3>
+        <p>Explore keyword matches and headline tone as research context. A topic match does not establish how a story changes the probability of a contract.</p>
         <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
           <g stroke="#e05a6d" stroke-opacity=".55" stroke-width="1.4" class="viz-links">
             <path pathLength="1" d="M110 28 L34 12"/><path pathLength="1" d="M110 28 L52 46"/><path pathLength="1" d="M110 28 L176 10"/><path pathLength="1" d="M110 28 L188 42"/>
@@ -164,8 +165,8 @@
       </div>
       <div class="card vcard rv">
         <div class="ico">03</div>
-        <h3>Sizes the bet</h3>
-        <p>A suggested stake based on how big the edge is and how sure we are, capped so one bad call can't wipe you out.</p>
+        <h3>Shows the gap, and the limit</h3>
+        <p>Where our read and the market disagree, you see by how much and why, alongside the most a disciplined position would ever risk. What you actually do is your call.</p>
         <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
           <rect x="6" y="22" width="208" height="12" rx="6" fill="#181d24"/>
           <rect class="viz-fill" x="6" y="22" width="52" height="12" rx="6" fill="url(#szg)"/>
@@ -187,9 +188,9 @@
     </div>
     <div class="scene-copy">
       <p class="beat" data-beat="0">News breaks.</p>
-      <p class="beat" data-beat="1">Resolv reads it <em>in seconds.</em></p>
+      <p class="beat" data-beat="1">Resolv gathers it <em>on the next update.</em></p>
       <p class="beat" data-beat="2">The price takes time to catch up.</p>
-      <p class="beat" data-beat="3">That window is <em>the opportunity.</em></p>
+      <p class="beat" data-beat="3">That lag is <em>what we watch for.</em></p>
     </div>
     <div class="scene-meter" aria-hidden="true"><i id="gapMeter"></i></div>
   </div>
@@ -202,7 +203,7 @@
   <div class="wrap">
     <div class="section-head rv">
       <p class="kicker">How it works</p>
-      <h2 class="statement sm">From headline to sized position, in seconds.</h2>
+      <h2 class="statement sm">From current quotes to a research scenario.</h2>
     </div>
     <div class="step-strip">
       <div class="card step-item rv">
@@ -231,7 +232,7 @@
           </svg>
         </div>
         <h3>We read it</h3>
-        <p>Scored in seconds: which way it pushes prices, and how hard.</p>
+        <p>Inspect the source and topic. Generic news tone is not an outcome forecast.</p>
         <span class="step-link" aria-hidden="true"></span>
       </div>
       <div class="card step-item rv">
@@ -244,7 +245,7 @@
           </svg>
         </div>
         <h3>We price it</h3>
-        <p>What it's worth, next to what the market is charging.</p>
+        <p>Inspect a heuristic estimate beside the market quote; validated forecasts are a separate feature.</p>
         <span class="step-link" aria-hidden="true"></span>
       </div>
       <div class="card step-item rv">
@@ -257,10 +258,39 @@
           </svg>
         </div>
         <h3>You size it</h3>
-        <p>A suggested stake, capped so one bad call can't hurt you.</p>
+        <p>We show the ceiling the maths allows. What you risk is your call.</p>
       </div>
     </div>
     <p class="fine rv">That's the whole pipeline in plain English. <a href="methodology.html">Read the full methodology →</a></p>
+  </div>
+</section>
+
+<!-- ══════════ THE OBVIOUS QUESTION ══════════ -->
+<section class="band" id="edge">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">The obvious question</p>
+      <h2 class="statement sm">Aren't these markets<br>already efficient?</h2>
+      <p class="lede">Mostly, yes. That is why our answer on most contracts is sit this one out, and why we would rather say that than manufacture a reason to trade. Where gaps do persist, it is for reasons that are boring and structural rather than clever.</p>
+    </div>
+    <div class="cards3">
+      <div class="card rv">
+        <div class="ico">01</div>
+        <h3>Attention is the scarce thing</h3>
+        <p>Hundreds of contracts are open at once and most have nobody watching them closely. We are not faster than a trading desk on the headline everyone is already reading. We cover the rest of the board, the part nobody has time for.</p>
+      </div>
+      <div class="card rv">
+        <div class="ico">02</div>
+        <h3>Two exchanges, one question</h3>
+        <p>The same event often trades at a different price on Kalshi than it does on Polymarket. That is not a theory about efficiency, it is arithmetic, and it is visible the moment you line the two up side by side.</p>
+      </div>
+      <div class="card rv">
+        <div class="ico">03</div>
+        <h3>Longshots run rich</h3>
+        <p>Cheap, unlikely contracts are persistently overbought. It is one of the best documented patterns in betting markets, it has survived decades of people knowing about it, and we correct for it in every price we publish.</p>
+      </div>
+    </div>
+    <p class="fine rv">So we are not claiming to outguess the crowd. We read more of the wire than you have time to, we show what it implies for each contract, and we say plainly when the market has it about right. <a href="methodology.html#faq">See how we check ourselves →</a></p>
   </div>
 </section>
 
@@ -276,18 +306,18 @@
       <div class="proof-chart rv">
         <div class="pc-head">
           <b>When we say 70%, does it happen 70% of the time?</b>
-          <span class="badge-sample">VALIDATION RUN</span>
+          <span class="badge-sample">ILLUSTRATION ONLY</span>
         </div>
-        <canvas id="calChart" aria-label="Chart comparing forecast probability to how often those events actually happened; points sit close to the perfect-calibration line"></canvas>
-        <p class="pc-note">Each dot is a group of forecasts. The closer to the line, the better calibrated. Off the line means we were over- or under-confident.</p>
+        <canvas id="calChart" aria-label="Illustration of calibration concepts, not measured model performance"></canvas>
+        <p class="pc-note">This diagram explains calibration; its curves are illustrative. Actual model results must come from held-out resolved events.</p>
       </div>
       <div class="proof-stats">
-        <div class="pstat rv"><b class="mono" data-count="73" data-suffix="%">0</b><span>of our confident calls landed on the right side in validation</span></div>
+        <div class="pstat rv"><b class="mono">Pending</b><span>no live model has passed the deployment gates</span></div>
         <div class="pstat rv"><b class="mono">4<span class="dim">pt</span></b><span>minimum edge before we'll call anything; below that, we stay quiet</span></div>
-        <div class="pstat rv"><b class="mono">15<span class="dim">%</span></b><span>hard cap on any suggested stake, no matter how good it looks</span></div>
+        <div class="pstat rv"><b class="mono">15<span class="dim">%</span></b><span>hard ceiling on any position, no matter how good it looks</span></div>
       </div>
     </div>
-    <p class="fine rv">Figures from our current validation run on sample history, not a live track record; we'll publish live results as they accumulate. <a href="methodology.html#calibration">How we measure this →</a></p>
+    <p class="fine rv">The first real-data candidate failed the market-baseline and event-coverage gates. The diagram is illustrative and the thresholds are research settings, not evidence of predictive performance. <a href="methodology.html#calibration">How we measure this →</a></p>
   </div>
 </section>
 
@@ -296,8 +326,8 @@
   <div class="wrap">
     <div class="section-head rv">
       <p class="kicker">Live data</p>
-      <h2 class="statement sm">News breaks. We price it.</h2>
-      <p class="lede">Real headlines, loading in your browser as you read, each one scored for direction and mapped to the contracts it touches. Pick any headline to see our read.</p>
+      <h2 class="statement sm">News breaks. We read it.</h2>
+      <p class="lede">Current business headlines with source links and topic matches. Quotes and news are polled approximately every ten minutes; refreshes can be delayed. Headline tone is exploratory context, not a trading signal.</p>
     </div>
     <div class="wire rv">
       <div class="feed">
@@ -321,7 +351,7 @@
         </div>
       </aside>
     </div>
-    <p class="fine rv">Headlines are live from the public wire; the score is our reading of each one. The contracts shown against them are sample markets for illustration; live market links arrive with the beta. <a href="methodology.html#evidence">How evidence moves a price →</a></p>
+    <p class="fine rv">Headlines are live from the public wire; the score is our reading of each one. Market labels identify live exchange quotes or sample contracts. Source outages are shown explicitly. <a href="methodology.html#evidence">How evidence moves a price →</a></p>
   </div>
 </section>
 
@@ -339,7 +369,7 @@
         <div class="hb-top" aria-hidden="true">
           <span class="badge-sample">SNAPSHOT</span>
           <span class="badge-sample">EXAMPLE</span>
-          <span class="badge-sample">VALIDATION RUN</span>
+          <span class="badge-sample">ILLUSTRATION ONLY</span>
         </div>
         <h3>Labeled, always</h3>
         <p>Anything that isn't live data says so, right where you're looking.</p>
@@ -368,8 +398,8 @@
   <div class="wrap">
     <div class="section-head rv">
       <p class="kicker">Pricing</p>
-      <h2 class="statement sm">Try it free for 14 days.</h2>
-      <p class="lede">Full access from day one. No card to start, and you can cancel with one click.</p>
+      <h2 class="statement sm">Plans for the full product.</h2>
+      <p class="lede">Explore the research terminal now. Paid subscriptions and trial billing are not yet available.</p>
     </div>
 
     <div class="price-grid">
@@ -377,24 +407,24 @@
         <h3>Basic</h3>
         <p class="who">If you trade your own money and want a clear call.</p>
         <div class="amt">$12<small>/month</small></div>
-        <p class="trial">14 days free</p>
+        <p class="trial">PLANNED PRICING</p>
         <ul>
           <li><b>The call</b>: buy, sell or sit out, on every market</li>
           <li><b>The reason</b>: the headlines driving it, in plain English</li>
-          <li><b>The size</b>: how much to risk</li>
+          <li><b>The ceiling</b>: the most a disciplined position would risk</li>
           <li>Alerts when a market crosses your price</li>
           <li>Both exchanges in one watchlist</li>
         </ul>
-        <a class="btn" href="#access">Start free</a>
+        <a class="btn" href="#access">Request beta access</a>
       </div>
 
       <div class="price-card feat rv">
-        <span class="ribbon">Most popular</span>
+        <span class="ribbon">Research tools</span>
         <span class="price-sheen" aria-hidden="true"></span>
         <h3>Pro</h3>
         <p class="who">If you trade seriously and need to see the workings.</p>
         <div class="amt">$39<small>/month</small></div>
-        <p class="trial">14 days free</p>
+        <p class="trial">PLANNED PRICING</p>
         <ul>
           <li><b>Everything in Basic</b></li>
           <li><b>The full breakdown</b>: every number behind a price, line by line</li>
@@ -403,7 +433,7 @@
           <li><b>Portfolio risk</b>: exposure and worst-case view</li>
           <li>Export your session for your own records</li>
         </ul>
-        <a class="btn primary" href="#access">Start free</a>
+        <a class="btn primary" href="#access">Request beta access</a>
       </div>
 
       <div class="price-card rv">
@@ -432,8 +462,8 @@
 <!-- ══════════ CTA ══════════ -->
 <section class="band cta-band" id="access">
   <div class="wrap">
-    <h2 class="statement center rv">Start free.</h2>
-    <p class="cta-sub rv">Private beta. 14 days, full access, no card.</p>
+    <h2 class="statement center rv">Explore the beta.</h2>
+    <p class="cta-sub rv">The research terminal is open. Online access requests will become available when a signup service is configured.</p>
     <form class="wait-form rv" id="waitForm" novalidate>
       <input type="email" id="waitEmail" placeholder="you@email.com" aria-label="Email address" autocomplete="email" maxlength="254" spellcheck="false" required>
       <button class="btn primary" type="submit" id="waitBtn">Get access</button>
@@ -450,10 +480,10 @@
       <div class="foot-links">
         <a href="methodology.html">Methodology</a>
         <a href="#pricing">Pricing</a>
-        <a href="#access">Start free</a>
+        <a href="#access">Request beta access</a>
       </div>
     </div>
-    <p class="foot-legal">Resolv is an analytics tool, not a broker or an exchange. Our estimates come from public data and published models; they are not guarantees and not financial advice. Event contracts can lose their full value. &copy; <span id="year">2026</span> Resolv</p>
+    <p class="foot-legal">Resolv is an analytics tool. It is not a broker, an exchange, or an investment adviser. Everything here is general information produced by a published model from public data: not personalised advice, not a recommendation to trade, and not a guarantee. Position figures are risk ceilings from a fixed formula, not instructions, and they take no account of your circumstances. You place your own trades and are responsible for them. Event contracts can lose their full value. &copy; <span id="year">2026</span> Resolv</p>
   </div>
 </footer>
 

@@ -1,0 +1,45 @@
+name: Publish website and market snapshots
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '7,17,27,37,47,57 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: resolv-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/configure-pages@v5
+      - uses: actions/cache@v4
+        with:
+          path: .cache
+          key: resolv-feed-${{ github.run_id }}
+          restore-keys: resolv-feed-
+      - name: Fetch public feeds and stage only public files
+        run: python scripts/build_site.py
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

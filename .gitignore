@@ -1,0 +1,14 @@
+.DS_Store
+**/.venv/
+**/__pycache__/
+*.pyc
+runtime/
+**/data/*.sqlite*
+**/models/
+**/reports/*.log
+.env
+.env.*
+!.env.example
+
+_site/
+.cache/
