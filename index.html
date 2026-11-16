@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Security: CSP mirrors Website/_headers (real headers win where supported).
+     connect-src must stay identical in index.html, methodology.html, 404.html
+     and _headers. If you set API_ORIGIN in script.js, add that origin to all
+     four, or the browser will block the feed and the signup POST. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-tHd4qJ0R/vQfI0CbRTiL3XGSi+Tun7VhOcDbx08aLKA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.gdeltproject.org; base-uri 'none'; form-action 'self'; object-src 'none'; frame-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Resolv · The Intelligence Layer for Prediction Markets</title>
+<meta name="description" content="Resolv puts the news wire, Kalshi and Polymarket on one screen, links each story to the contracts it may touch, and shows where the evidence and the market disagree, or says plainly when it can't tell. 14 days free.">
+<meta name="theme-color" content="#07090b">
+<link rel="canonical" href="https://resolvterminal.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Resolv">
+<meta property="og:title" content="Resolv · The Intelligence Layer for Prediction Markets">
+<meta property="og:description" content="Every headline, every contract, one screen. See what the evidence says, and where the market disagrees.">
+<meta property="og:url" content="https://resolvterminal.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Resolv · The Intelligence Layer for Prediction Markets">
+<meta name="twitter:description" content="Every headline, every contract, one screen. See what the evidence says, and where the market disagrees.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307090b'/%3E%3Ccircle cx='11' cy='12' r='4' fill='%23bd8a10'/%3E%3Ccircle cx='22' cy='20' r='3' fill='%234db5ff'/%3E%3Cpath d='M11 12 L22 20' stroke='%23e05a6d' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>document.documentElement.className+=" js";</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="bg-layer" aria-hidden="true"></div>
+<div class="bg-aurora" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav" id="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Resolv home"><span class="logo">resolv<span class="logo-dot"></span></span></a>
+    <div class="navlinks">
+      <a href="#what">What it does</a>
+      <a href="#proof">Proof</a>
+      <a href="#live">Live data</a>
+      <a href="#pricing">Pricing</a>
+      <a href="methodology.html">Methodology</a>
+      <a class="btn primary sm" href="#access">Start free</a>
+    </div>
+    <button class="navtoggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+  </div>
+</nav>
+<div class="mobilemenu" id="mobileMenu">
+  <a href="#what">What it does</a><a href="#proof">Proof</a><a href="#live">Live data</a>
+  <a href="#pricing">Pricing</a><a href="methodology.html">Methodology</a>
+  <a class="btn primary" href="#access">Start free</a>
+</div>
+
+<main id="main">
+<span id="top"></span>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero">
+  <canvas id="heroBg" class="hero-bg" aria-hidden="true"></canvas>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow fade-1">Every headline · Every contract</p>
+      <h1 class="display">
+        <span class="line"><span class="w">The</span> <span class="w">intelligence</span> <span class="w">layer</span></span>
+        <span class="line"><span class="w">for</span> <span class="w accent">prediction</span> <span class="w accent">markets.</span></span>
+      </h1>
+      <p class="hero-sub fade-2">Hundreds of headlines a day, hundreds of open contracts, and no way to read them all. Resolv puts the news wire and both exchanges on one screen, links each story to the contracts it may touch, and shows you where the evidence and the market disagree, or says plainly when it can't tell.</p>
+      <div class="btn-row fade-3">
+        <a class="btn primary lg" href="#access">Start 14 days free</a>
+        <a class="btn lg ghost" href="#what" data-terminal-link>Explore the terminal</a>
+      </div>
+      <p class="hero-note fade-3">
+        <span class="live-pill" id="heroLive"><span class="hp-dot"></span>NEWS WIRE · CONNECTING</span>
+        <span class="hero-note-txt">No card required</span>
+      </p>
+    </div>
+
+    <div class="hero-card-tilt fade-2" id="heroTilt">
+    <div class="hero-card" id="heroCard" aria-label="Example of a Resolv verdict">
+      <span class="hc-sheen" aria-hidden="true"></span>
+      <div class="hc-top">
+        <span class="hc-venue">KALSHI</span>
+        <span class="badge-sample">EXAMPLE</span>
+      </div>
+      <div class="hc-q">Fed cuts rates in July</div>
+      <canvas id="hcSpark" class="hc-spark" aria-hidden="true"></canvas>
+      <div class="hc-gauge">
+        <div class="hcg-track"><i class="hcg-fill" style="width:63.1%"></i><span class="hcg-mark" style="left:58%"></span></div>
+        <div class="hcg-legend">
+          <span><b class="mono">58¢</b> market price</span>
+          <span class="accent"><b class="mono">63¢</b> what we think it's worth</span>
+        </div>
+      </div>
+      <div class="hc-verdict">
+        <div><span class="hcv-tag buy">BUY</span></div>
+        <div class="hc-meta"><b class="up mono">+5¢</b> underpriced · <b class="mono">73%</b> confident</div>
+      </div>
+      <div class="hc-foot">
+        <span>Risk ceiling</span>
+        <b class="mono">3.5% of bankroll</b>
+      </div>
+    </div>
+    <p class="micro hero-disclaim">Illustrative example, not a live call. Live contracts stay on hold until a model beats the market on held-out data. Resolv is analysis, not advice: it never places a trade, and the ceiling is a limit from a fixed formula, not an instruction.</p>
+    </div>
+  </div>
+  <div class="scroll-cue fade-3" aria-hidden="true"><span class="cue-line"></span></div>
+</section>
+
+<!-- ══════════ TAPE (sample, labeled) ══════════ -->
+<section class="tape" aria-label="Market tape: sample contracts, illustrative, until real exchange quotes load">
+  <div class="tape-label"><span class="badge-sample" id="tapeBadge">SAMPLE</span><span class="tape-note" id="tapeNote">ILLUSTRATIVE, NOT LIVE PRICES</span></div>
+  <div class="tape-clip" aria-hidden="true"><div class="tape-track" id="tapeTrack"></div></div>
+</section>
+
+<!-- ══════════ STRIP ══════════ -->
+<section class="strip">
+  <div class="wrap strip-grid">
+    <div class="strip-item rv"><b class="accent">2</b><span>exchanges in one place</span></div>
+    <div class="strip-item rv"><b class="up">Every 90s</b><span>headlines refreshed on this page</span></div>
+    <div class="strip-item rv"><b>5</b><span>stages from headline to risk ceiling</span></div>
+    <div class="strip-item rv"><b class="warn">14 days</b><span>free, no card</span></div>
+  </div>
+</section>
+
+<!-- ══════════ WHAT IT DOES ══════════ -->
+<section class="band" id="what">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">What it does</p>
+      <h2 class="statement sm">Three things, every minute.</h2>
+    </div>
+    <div class="cards3">
+      <div class="card vcard rv">
+        <div class="ico">01</div>
+        <h3>Reads everything, everywhere</h3>
+        <p>Open contracts from both exchanges, and the news wire behind them, pulled into one place and refreshed every minute. Anything that isn't a live quote is labelled, with its age.</p>
+        <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
+          <g fill="#2b343d" class="viz-bars">
+            <rect x="6"   y="30" width="9" height="20" rx="2"/><rect x="24"  y="24" width="9" height="26" rx="2"/>
+            <rect x="42"  y="34" width="9" height="16" rx="2"/><rect x="60"  y="27" width="9" height="23" rx="2"/>
+            <rect x="78"  y="31" width="9" height="19" rx="2"/><rect x="114" y="25" width="9" height="25" rx="2"/>
+            <rect x="132" y="33" width="9" height="17" rx="2"/><rect x="150" y="28" width="9" height="22" rx="2"/>
+            <rect x="168" y="35" width="9" height="15" rx="2"/><rect x="186" y="26" width="9" height="24" rx="2"/>
+          </g>
+          <circle class="viz-halo" cx="100.5" cy="14" r="9" fill="none" stroke="#4db5ff" stroke-opacity=".35" stroke-width="4"/>
+          <rect class="viz-outlier" x="96" y="10" width="9" height="40" rx="2" fill="#4db5ff"/>
+        </svg>
+      </div>
+      <div class="card vcard rv">
+        <div class="ico">02</div>
+        <h3>Works out what it means</h3>
+        <p>Each headline is scored for tone and linked to the contracts it may bear on, so you see the context, not just a number. On live contracts a headline carries no weight until contract-specific evidence is validated. If we can't point to a reason, we don't make a call.</p>
+        <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
+          <g stroke="#e05a6d" stroke-opacity=".55" stroke-width="1.4" class="viz-links">
+            <path pathLength="1" d="M110 28 L34 12"/><path pathLength="1" d="M110 28 L52 46"/><path pathLength="1" d="M110 28 L176 10"/><path pathLength="1" d="M110 28 L188 42"/>
+          </g>
+          <circle class="viz-dot" cx="34" cy="12" r="5" fill="#4d8be0"/><circle class="viz-dot" cx="52" cy="46" r="5" fill="#4d8be0"/>
+          <circle class="viz-dot" cx="176" cy="10" r="5" fill="#4d8be0"/><circle class="viz-dot" cx="188" cy="42" r="5" fill="#4d8be0"/>
+          <circle class="viz-core" cx="110" cy="28" r="10" fill="#bd8a10"/>
+          <circle class="viz-ring" cx="110" cy="28" r="15" fill="none" stroke="#bd8a10" stroke-opacity=".3" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="card vcard rv">
+        <div class="ico">03</div>
+        <h3>Shows the gap, and the limit</h3>
+        <p>Where a validated model and the market disagree, you see by how much and why, alongside the most a disciplined position would ever risk. Until a model qualifies, live contracts show the market price and stay on hold. What you do is your call.</p>
+        <svg class="card-viz" viewBox="0 0 220 56" aria-hidden="true">
+          <rect x="6" y="22" width="208" height="12" rx="6" fill="#181d24"/>
+          <rect class="viz-fill" x="6" y="22" width="52" height="12" rx="6" fill="url(#szg)"/>
+          <defs><linearGradient id="szg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4db5ff"/><stop offset="1" stop-color="#3ddc97"/></linearGradient></defs>
+          <rect class="viz-cap" x="119" y="16" width="2.5" height="24" rx="1" fill="#ff6b7d"/>
+          <text class="viz-txt" x="6" y="52" font-family="JetBrains Mono,monospace" font-size="9" fill="#626d78">suggested</text>
+          <text class="viz-txt" x="123" y="52" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff6b7d" fill-opacity=".8">hard cap</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SCENE · THE GAP ══════════ -->
+<section class="scene" id="gap" data-scene="gap">
+  <div class="scene-inner">
+    <div class="scene-stage">
+      <canvas id="gapCanvas" aria-label="Illustrative concept, not market data: a contract price lagging behind its fair value after news breaks, then catching up"></canvas>
+    </div>
+    <div class="scene-copy">
+      <p class="beat" data-beat="0">News breaks.</p>
+      <p class="beat" data-beat="1">Resolv picks it up <em>on the next refresh.</em></p>
+      <p class="beat" data-beat="2">The price takes time to catch up.</p>
+      <p class="beat" data-beat="3">That lag is <em>what we watch for.</em></p>
+    </div>
+    <div class="scene-meter" aria-hidden="true"><i id="gapMeter"></i></div>
+  </div>
+</section>
+
+<!-- ══════════ HOW IT WORKS · STEPPER ══════════
+     Insert AFTER the closing </section> of the gap scene (data-scene="gap"),
+     immediately BEFORE the PROOF section comment. Needs index-sections.css. -->
+<section class="band step-band" id="how">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">How it works</p>
+      <h2 class="statement sm">From headline to sized position, in seconds.</h2>
+    </div>
+    <div class="step-strip">
+      <div class="card step-item rv">
+        <div class="step-top">
+          <div class="ico">01</div>
+          <svg class="step-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="2.4" fill="#4db5ff"/>
+            <path d="M8.2 15.8a5.4 5.4 0 0 1 0-7.6" fill="none" stroke="#4d8be0" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M15.8 8.2a5.4 5.4 0 0 1 0 7.6" fill="none" stroke="#4d8be0" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M5.4 18.6a9.4 9.4 0 0 1 0-13.2" fill="none" stroke="#4d8be0" stroke-opacity=".45" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18.6 5.4a9.4 9.4 0 0 1 0 13.2" fill="none" stroke="#4d8be0" stroke-opacity=".45" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>News breaks</h3>
+        <p>A headline hits the wire.</p>
+        <span class="step-link" aria-hidden="true"></span>
+      </div>
+      <div class="card step-item rv">
+        <div class="step-top">
+          <div class="ico">02</div>
+          <svg class="step-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="5.5" width="16" height="2" rx="1" fill="#2b343d"/>
+            <rect x="4" y="11" width="12.5" height="2" rx="1" fill="#4db5ff"/>
+            <rect x="4" y="16.5" width="8.5" height="2" rx="1" fill="#2b343d"/>
+            <path d="M17 18.5 L19.6 15.3 L22.2 18.5 Z" fill="#3ddc97"/>
+          </svg>
+        </div>
+        <h3>We read it</h3>
+        <p>Scored for tone and linked to the contracts it may touch.</p>
+        <span class="step-link" aria-hidden="true"></span>
+      </div>
+      <div class="card step-item rv">
+        <div class="step-top">
+          <div class="ico">03</div>
+          <svg class="step-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="7.6" width="9" height="2.6" rx="1.3" fill="#626d78"/>
+            <rect x="4" y="13.8" width="14.5" height="2.6" rx="1.3" fill="#4db5ff"/>
+            <rect x="13" y="13.8" width="5.5" height="2.6" rx="1.3" fill="#3ddc97"/>
+          </svg>
+        </div>
+        <h3>We price it</h3>
+        <p>What it's worth next to the market price, once a model has earned it.</p>
+        <span class="step-link" aria-hidden="true"></span>
+      </div>
+      <div class="card step-item rv">
+        <div class="step-top">
+          <div class="ico">04</div>
+          <svg class="step-glyph" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4.5" y="10.7" width="15" height="2.6" rx="1.3" fill="#181d24" stroke="#2b343d"/>
+            <rect x="4.5" y="10.7" width="6.5" height="2.6" rx="1.3" fill="#3ddc97"/>
+            <rect x="14.2" y="8.6" width="1.5" height="6.8" rx=".75" fill="#ff6b7d"/>
+          </svg>
+        </div>
+        <h3>You size it</h3>
+        <p>We show the ceiling the maths allows. What you risk is your call.</p>
+      </div>
+    </div>
+    <p class="fine rv">That's the whole pipeline in plain English. On live contracts the pricing and sizing steps stay on hold until a model beats the market on held-out data. <a href="methodology.html">Read the full methodology →</a></p>
+  </div>
+</section>
+
+<!-- ══════════ THE OBVIOUS QUESTION ══════════ -->
+<section class="band" id="edge">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">The obvious question</p>
+      <h2 class="statement sm">Aren't these markets<br>already efficient?</h2>
+      <p class="lede">Mostly, yes. That is why our answer on most contracts is sit this one out, and why we would rather say that than manufacture a reason to trade. Where gaps do persist, it is for reasons that are boring and structural rather than clever.</p>
+    </div>
+    <div class="cards3">
+      <div class="card rv">
+        <div class="ico">01</div>
+        <h3>Attention is the scarce thing</h3>
+        <p>Hundreds of contracts are open at once and most have nobody watching them closely. We are not faster than a trading desk on the headline everyone is already reading. We cover the rest of the board, the part nobody has time for.</p>
+      </div>
+      <div class="card rv">
+        <div class="ico">02</div>
+        <h3>Two exchanges, one question</h3>
+        <p>The same event can trade at different prices on Kalshi and Polymarket. Lined up side by side the gap is plain arithmetic, but only once both contracts are known to settle on the same rules, so live pairs need a reviewed match, and fees come off first.</p>
+      </div>
+      <div class="card rv">
+        <div class="ico">03</div>
+        <h3>Longshots run rich</h3>
+        <p>Cheap, unlikely contracts are persistently overbought. It is one of the best documented patterns in betting markets and it has survived decades of people knowing about it, so it is the first correction our model tests. On held-out data so far, it has not beaten the market price.</p>
+      </div>
+    </div>
+    <p class="fine rv">So we are not claiming to outguess the crowd. We read more of the wire than you have time to, we show what it implies for each contract, and we say plainly when the market has it about right. <a href="methodology.html#calibration">See how we check ourselves →</a></p>
+  </div>
+</section>
+
+<!-- ══════════ PROOF ══════════
+     No results are shown here because no model has beaten the market on
+     held-out data yet. The three gate figures mirror MLModel/resolv_ml/
+     config.py (PROMOTION_MARGIN, GATE_MIN_EVENTS, BOOTSTRAP_*,
+     DEMOTE_MIN_SCORED); keep them in sync. Where a Resolv server reports a
+     promoted model, script.js hides [data-if-no-model] and shows
+     [data-if-model]; neither carries a made-up number. -->
+<section class="band" id="proof">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">Proof</p>
+      <h2 class="statement sm">We keep score.</h2>
+      <p class="lede">Anyone can claim an edge. The honest test is whether a model beats the exchange's own price on contracts it has never seen. <span data-if-no-model>None of ours has yet, so we show the market price and say so.</span><span data-if-model hidden>This server reports a model that has, on held-out data; its status is below, and live calls stay on hold until its live record can be judged.</span></p>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-chart rv">
+        <div class="pc-head">
+          <b>How to read a calibration chart</b>
+          <span class="badge-sample">ILLUSTRATIVE</span>
+        </div>
+        <canvas id="calChart" aria-label="Illustrative calibration chart, not results: the diagonal is perfect calibration, and a flatter curve shows what an overconfident forecaster looks like"></canvas>
+        <p class="pc-note">Not results. A well calibrated forecaster's 70% calls come true about 70% of the time, so it sits on the diagonal. The curve is a textbook overconfident one: its bold calls come true less often than it said. This chart stays illustrative: a model's real calibration is in its training report, and its live record in the forward ledger.</p>
+      </div>
+      <div class="proof-stats">
+        <div class="pstat pstat-status rv" data-if-no-model><b class="mono">Not yet</b><span>No Resolv model has beaten the market price on held-out data (as of October 9, 2026). Until one does, live contracts show the exchange price and every live call stays on hold.</span></div>
+        <div class="pstat pstat-status" data-if-model hidden><b class="mono">Promoted</b><span>This server reports a model that beat the market price on held-out data. Its forecasts are shown for reference only: every live call stays on hold until its forward record is long enough to judge, and it is demoted if it loses to the market there.</span></div>
+        <div class="pstat rv"><b class="mono">0.0015</b><span>lower Brier score than the market price, on validation contracts, before a candidate is even considered; it must then beat the market on an untouched test set too</span></div>
+        <div class="pstat rv"><b class="mono">50<span class="dim">/</span>20<span class="dim">/</span>20</b><span>independent events needed in training, validation and test, and the lower 5% bound of test skill across 1,000 event-clustered resamples must stay above zero</span></div>
+      </div>
+    </div>
+    <div class="model-live" data-model-status hidden>
+      <span class="ml-pill"><span class="ml-dot"></span><span data-ms-pill>CHECKING</span></span>
+      <span class="ml-text" data-ms-text></span>
+    </div>
+    <p class="fine rv">The baseline is the exchange's own price at the same moment, not a coin flip. A promoted model keeps being scored on live forecasts and is demoted if it loses to the market over 40 or more of them. <a href="methodology.html#calibration">How we judge a model →</a> <a class="ws-view" data-workspace-view="model" hidden>Open the Model view ↗</a></p>
+  </div>
+</section>
+
+<!-- ══════════ LIVE DATA · THE WIRE ══════════ -->
+<section class="band" id="live">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">Live data</p>
+      <h2 class="statement sm">News breaks. We read it.</h2>
+      <p class="lede">Real headlines, loading in your browser as you read, each one scored for tone and linked by topic to the contracts it may touch. Pick any headline to see our read.</p>
+    </div>
+    <div class="wire rv">
+      <div class="feed">
+        <div class="feed-head">
+          <b>The wire · live headlines</b>
+          <div class="feed-controls">
+            <span class="countdown" id="feedCountdown"></span>
+            <span class="status" id="feedStatus"><span class="sd loading"></span>CONNECTING</span>
+            <button class="refresh-btn" id="feedRefresh" aria-label="Refresh news feed" title="Refresh">↻</button>
+          </div>
+        </div>
+        <div class="feed-rows" id="feedRows"><div class="feed-empty">Connecting to the wire…</div></div>
+      </div>
+      <aside class="impact" aria-label="How the selected headline maps to markets" aria-live="polite">
+        <div class="impact-head">
+          <b>What it touches</b>
+          <span class="badge-sample" id="impactBadge">SAMPLE MARKETS</span>
+        </div>
+        <div class="impact-body" id="impactBody">
+          <div class="imp-standby"><p>This pane lights up when the wire connects. Pick any headline to see how we score it and which contracts it touches.</p></div>
+        </div>
+      </aside>
+    </div>
+    <p class="fine rv">Headlines are live from the public wire; the score is a simple word-tone reading of each one, not the direction of any particular contract. Market labels say whether you are seeing live exchange quotes (with the time the server fetched them), cached quotes (with their age) or sample contracts. Source outages are shown explicitly. <a href="methodology.html#evidence">How evidence moves a price →</a> <a class="ws-view" data-workspace-view="news" hidden>Open the News wire view ↗</a></p>
+  </div>
+</section>
+
+<!-- ══════════ HONEST BY DESIGN ══════════
+     Insert AFTER the closing </section> of the live/wire section (id="live"),
+     immediately BEFORE the PRICING section comment. Needs index-sections.css. -->
+<section class="band hb-band" id="honesty">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">House rules</p>
+      <h2 class="statement sm">Honest by design.</h2>
+    </div>
+    <div class="hb-panel rv">
+      <div class="hb-item">
+        <div class="hb-top" aria-hidden="true">
+          <span class="badge-sample">SNAPSHOT</span>
+          <span class="badge-sample">STALE · 15M</span>
+          <span class="badge-sample">EXAMPLE</span>
+          <span class="badge-sample">ILLUSTRATIVE</span>
+        </div>
+        <h3>Labeled, always</h3>
+        <p>Anything that isn't live data says so, with its age, right where you're looking.</p>
+      </div>
+      <div class="hb-item">
+        <div class="hb-top" aria-hidden="true">
+          <span class="hb-pill"><span class="hb-dot"></span>STANDBY</span>
+        </div>
+        <h3>Standby, never stories</h3>
+        <p>When a feed dies you see standby, never made-up headlines.</p>
+      </div>
+      <div class="hb-item">
+        <div class="hb-top" aria-hidden="true">
+          <span class="hb-sum">news + history + market <b>= price</b></span>
+        </div>
+        <h3>No black box</h3>
+        <p>Every price breaks into named parts, and the parts add up exactly.</p>
+      </div>
+    </div>
+    <p class="fine rv">Rules, not promises; they're built into the product. <a href="methodology.html">See how →</a></p>
+  </div>
+</section>
+
+<!-- ══════════ PRICING ══════════ -->
+<section class="band" id="pricing">
+  <div class="wrap">
+    <div class="section-head rv price-head">
+      <div>
+        <p class="kicker">Pricing</p>
+        <h2 class="statement sm">Try it free for 14 days.</h2>
+        <p class="lede">Full access from day one. No card to start, and you can cancel with one click.</p>
+      </div>
+      <div class="bill" role="group" aria-label="Billing period">
+        <button type="button" class="on" data-bill="m" aria-pressed="true">Monthly</button>
+        <button type="button" data-bill="y" aria-pressed="false">Annual <span class="save">2 months free</span></button>
+      </div>
+    </div>
+
+    <div class="price-grid">
+      <div class="price-card rv">
+        <h3>Basic</h3>
+        <p class="who">If you trade your own money and want a clear read.</p>
+        <div class="amt"><span data-price data-m="12" data-y="10">$12</span><small>/month</small></div>
+        <p class="trial"><span data-billnote data-m="14 days free, then billed monthly" data-y="14 days free, then $120 a year">14 days free, then billed monthly</span></p>
+        <ul>
+          <li><b>The read</b>: buy, sell or sit out, on every market we can price</li>
+          <li><b>The reason</b>: the headlines behind it, in plain English</li>
+          <li><b>The ceiling</b>: the most a disciplined position would risk</li>
+          <li>Alerts when a market crosses your price</li>
+          <li>Both exchanges in one watchlist</li>
+        </ul>
+        <a class="btn" href="#access" data-plan="basic">Start free</a>
+      </div>
+
+      <div class="price-card feat rv">
+        <span class="ribbon">Recommended</span>
+        <span class="price-sheen" aria-hidden="true"></span>
+        <h3>Pro</h3>
+        <p class="who">If you trade seriously and need to see the workings.</p>
+        <div class="amt"><span data-price data-m="39" data-y="32">$39</span><small>/month</small></div>
+        <p class="trial"><span data-billnote data-m="14 days free, then billed monthly" data-y="14 days free, then $384 a year">14 days free, then billed monthly</span></p>
+        <ul>
+          <li><b>Everything in Basic</b></li>
+          <li><b>The full breakdown</b>: every number behind a price, line by line</li>
+          <li><b>Evidence graph</b>: the whole board, every event family and its implied distribution</li>
+          <li><b>Price gaps between exchanges</b>, after fees</li>
+          <li><b>Portfolio risk</b>: exposure and worst-case view</li>
+          <li>Export your session for your own records</li>
+        </ul>
+        <a class="btn primary" href="#access" data-plan="pro">Start free</a>
+      </div>
+
+      <div class="price-card rv">
+        <h3>Desk</h3>
+        <p class="who">If a team needs it wired into their own systems.</p>
+        <div class="amt">Custom</div>
+        <p class="trial">Priced by seats and data</p>
+        <ul>
+          <li><b>Everything in Pro</b></li>
+          <li><b>API access</b> to the pricing engine</li>
+          <li>Seats for your team</li>
+          <li>Audit logs for compliance</li>
+          <li>Custom alerts and data feeds</li>
+        </ul>
+        <a class="btn" href="#access" data-plan="desk">Get in touch</a>
+      </div>
+    </div>
+
+    <div class="promise rv" aria-label="What every plan includes">
+      <div><b>No card to start</b><span>The trial is the full product, not a demo.</span></div>
+      <div><b>Cancel in one click</b><span>No call, no form, no retention offer.</span></div>
+      <div><b>Your data leaves with you</b><span>Watchlist, positions and notes export any time.</span></div>
+      <div><b>Never touches your money</b><span>Resolv is analysis. It places no trades and holds no funds.</span></div>
+    </div>
+
+    <div class="worth rv" id="worth">
+      <div class="worth-copy">
+        <p class="kicker">The honest maths</p>
+        <h3>What it has to be worth to you.</h3>
+        <p>A subscription is only sensible if it is small next to what you put at risk. Set your usual position and see the plan as a share of one trade. This is arithmetic, not a promise of returns.</p>
+        <label class="worth-ctl" for="worthPos"><span>Your usual position</span><b class="mono" id="worthVal">$500</b></label>
+        <input type="range" id="worthPos" min="0" max="100" value="50" step="1" aria-describedby="worthNote">
+        <div class="worth-scale mono"><span>$50</span><span>$500</span><span>$5,000</span></div>
+      </div>
+      <div class="worth-out">
+        <div class="worth-row"><span>Basic</span><div class="worth-bar"><i id="worthB"></i></div><b class="mono" id="worthBv">2.4%</b></div>
+        <div class="worth-row"><span>Pro</span><div class="worth-bar"><i id="worthP" class="p"></i></div><b class="mono" id="worthPv">7.8%</b></div>
+        <p class="worth-note" id="worthNote">Pro costs <b>7.8%</b> of one $500 position a month. One avoided mistake of that size a month covers it.</p>
+        <p class="worth-fine">Resolv has no audited track record yet, so we will not tell you it pays for itself. That is why the trial is free, full and needs no card: judge it on your own markets.</p>
+      </div>
+    </div>
+
+    <div class="cmp rv">
+      <div class="cmp-head">
+        <h3>Compare every plan</h3>
+        <p>Nothing hidden behind "contact us" except the things that genuinely depend on your team.</p>
+      </div>
+      <div class="cmp-scroll" tabindex="0" role="region" aria-label="Plan comparison">
+      <table class="cmp-table">
+        <thead><tr><th scope="col">&nbsp;</th><th scope="col">Basic</th><th scope="col" class="f">Pro</th><th scope="col">Desk</th></tr></thead>
+        <tbody>
+          <tr class="g"><th colspan="4" scope="colgroup">Watch</th></tr>
+          <tr><th scope="row">Kalshi and Polymarket in one board</th><td>✓</td><td class="f">✓</td><td>✓</td></tr>
+          <tr><th scope="row">News wire mapped to contracts</th><td>✓</td><td class="f">✓</td><td>✓</td></tr>
+          <tr><th scope="row">Watchlist and price alerts</th><td>25 markets</td><td class="f">Unlimited</td><td>Unlimited</td></tr>
+          <tr class="g"><th colspan="4" scope="colgroup">Understand</th></tr>
+          <tr><th scope="row">Plain-English reason on every read</th><td>✓</td><td class="f">✓</td><td>✓</td></tr>
+          <tr><th scope="row">Line-by-line attribution of a price</th><td>–</td><td class="f">✓</td><td>✓</td></tr>
+          <tr><th scope="row">Evidence graph with event families</th><td>View</td><td class="f">Full</td><td>Full</td></tr>
+          <tr><th scope="row">Market-implied distributions</th><td>–</td><td class="f">✓</td><td>✓</td></tr>
+          <tr><th scope="row">Resolution-wording risk</th><td>✓</td><td class="f">✓</td><td>✓</td></tr>
+          <tr class="g"><th colspan="4" scope="colgroup">Decide</th></tr>
+          <tr><th scope="row">Position ceiling calculator</th><td>✓</td><td class="f">✓</td><td>✓</td></tr>
+          <tr><th scope="row">Season simulator</th><td>–</td><td class="f">✓</td><td>✓</td></tr>
+          <tr><th scope="row">Cross-venue gaps after fees</th><td>–</td><td class="f">✓</td><td>✓</td></tr>
+          <tr><th scope="row">Portfolio marked to market</th><td>–</td><td class="f">✓</td><td>✓</td></tr>
+          <tr><th scope="row">CSV and JSON export</th><td>–</td><td class="f">✓</td><td>✓</td></tr>
+          <tr class="g"><th colspan="4" scope="colgroup">Build</th></tr>
+          <tr><th scope="row">Pricing engine API</th><td>–</td><td class="f">–</td><td>✓</td></tr>
+          <tr><th scope="row">Team seats and audit log</th><td>–</td><td class="f">–</td><td>✓</td></tr>
+          <tr><th scope="row">Custom feeds and alert routing</th><td>–</td><td class="f">–</td><td>✓</td></tr>
+          <tr><th scope="row">Support</th><td>Email</td><td class="f">Priority email</td><td>Named contact</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="faq price-faq rv">
+      <details><summary>What happens when the 14 days end?</summary><div class="fa">Nothing, unless you choose a plan. There is no card on file, so the trial cannot turn into a charge. Your watchlist and logged positions stay exportable.</div></details>
+      <details><summary>Can I switch between Basic and Pro?</summary><div class="fa">Any time, in either direction. Moving up takes effect immediately and you pay the difference for the days left. Moving down takes effect at the next renewal.</div></details>
+      <details><summary>What does annual billing change?</summary><div class="fa">Only the price: you pay for ten months and get twelve. If you cancel an annual plan in the first 30 days you get all of it back.</div></details>
+      <details><summary>Why is there no free plan?</summary><div class="fa">Live exchange data and the news wire cost money to run, and a free tier would have to be paid for by something else, such as your attention or your data. We would rather charge a clear price and owe you nothing but the product.</div></details>
+    </div>
+
+    <div class="price-note rv">
+      <span><b>Not sure which?</b> Start on Basic. If you find yourself wanting to know <em>why</em> a price moved, that's Pro.</span>
+      <a href="methodology.html">Read the methodology →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CTA ══════════ -->
+<section class="band cta-band" id="access">
+  <div class="wrap">
+    <h2 class="statement center rv">Start free.</h2>
+    <p class="cta-sub rv" id="ctaSub">Pre-launch. Signups open at launch: 14 days free, full access, no card.</p>
+    <form class="wait-form rv" id="waitForm" novalidate>
+      <input type="email" id="waitEmail" placeholder="you@email.com" aria-label="Email address" autocomplete="email" maxlength="254" spellcheck="false" required>
+      <button class="btn primary" type="submit" id="waitBtn">Note my interest</button>
+    </form>
+    <p class="wait-note rv" id="waitNote">Until then this form keeps your address in this browser only. Nothing is sent to Resolv.</p>
+    <div class="wait-msg" id="waitMsg" role="status" aria-live="polite"></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot-inner rv">
+    <div class="foot-brand">
+      <span class="logo">resolv<span class="logo-dot"></span></span>
+      <div class="foot-links">
+        <a href="methodology.html">Methodology</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#access">Start free</a>
+      </div>
+    </div>
+    <p class="foot-legal">Resolv is an analytics tool. It is not a broker, an exchange, or an investment adviser. Everything here is general information produced by a published model from public data: not personalised advice, not a recommendation to trade, and not a guarantee. Position figures are risk ceilings from a fixed formula, not instructions, and they take no account of your circumstances. You place your own trades and are responsible for them. Event contracts can lose their full value. &copy; <span id="year">2026</span> Resolv</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

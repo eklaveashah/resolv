@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Security: CSP mirrors Website/_headers (real headers win where supported).
+     connect-src must stay identical in index.html, methodology.html, 404.html
+     and _headers. If you set API_ORIGIN in script.js, add that origin to all
+     four, or the browser will block the feed and the signup POST. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-tHd4qJ0R/vQfI0CbRTiL3XGSi+Tun7VhOcDbx08aLKA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.gdeltproject.org; base-uri 'none'; form-action 'self'; object-src 'none'; frame-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>How Resolv Works · Methodology</title>
+<meta name="description" content="How Resolv prices event contracts: the five-stage pipeline, the two model families, how evidence is mapped, and the gate a model must clear against the market before it prices anything live.">
+<meta name="theme-color" content="#07090b">
+<link rel="canonical" href="https://resolvterminal.com/methodology.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Resolv">
+<meta property="og:title" content="How Resolv Works · Methodology">
+<meta property="og:description" content="The five-stage pipeline, the two model families, and how we score our own forecasts.">
+<meta property="og:url" content="https://resolvterminal.com/methodology.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How Resolv Works · Methodology">
+<meta name="twitter:description" content="The five-stage pipeline, the two model families, and how we score our own forecasts.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307090b'/%3E%3Ccircle cx='11' cy='12' r='4' fill='%23bd8a10'/%3E%3Ccircle cx='22' cy='20' r='3' fill='%234db5ff'/%3E%3Cpath d='M11 12 L22 20' stroke='%23e05a6d' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>document.documentElement.className+=" js";</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="bg-layer" aria-hidden="true"></div>
+<div class="bg-aurora" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav stuck" id="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Resolv home"><span class="logo">resolv<span class="logo-dot"></span></span></a>
+    <div class="navlinks">
+      <a href="index.html#what">What it does</a>
+      <a href="index.html#proof">Proof</a>
+      <a href="index.html#live">Live data</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="methodology.html" aria-current="page">Methodology</a>
+      <a class="btn primary sm" href="index.html#access">Start free</a>
+    </div>
+    <button class="navtoggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+  </div>
+</nav>
+<div class="mobilemenu" id="mobileMenu">
+  <a href="index.html#what">What it does</a><a href="index.html#proof">Proof</a>
+  <a href="index.html#live">Live data</a><a href="index.html#pricing">Pricing</a>
+  <a class="btn primary" href="index.html#access">Start free</a>
+</div>
+
+<main id="main">
+
+<!-- ══════════ DOC HERO ══════════ -->
+<header class="doc-hero">
+  <div class="wrap">
+    <a class="back-link" href="index.html">← Back to Resolv</a>
+    <p class="eyebrow">Methodology</p>
+    <h1 class="statement">How Resolv prices<br>an event contract.</h1>
+    <p class="lede">The short version is on the <a href="index.html#what">main page</a>. This is the long version: what goes in, what the model does with it, when it refuses to answer, and how we check ourselves. Every worked figure on this page is labelled EXAMPLE or ILLUSTRATIVE; none of them is a result.</p>
+    <div class="doc-toc">
+      <a href="#pipeline">The pipeline</a>
+      <a href="#models">The two models</a>
+      <a href="#walkthrough">Worked example</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#risk">Resolution risk</a>
+      <a href="#calibration">Calibration</a>
+      <a href="#faq">FAQ</a>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════ PIPELINE ══════════ -->
+<section class="band" id="pipeline">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">The pipeline</p>
+      <h2 class="statement sm">From headline to sized position,<br>in one pass.</h2>
+      <p class="lede">Five deterministic stages. Click any one to look inside; the same pipeline runs on every refresh.</p>
+    </div>
+    <div class="rail rv" id="rail" role="tablist" aria-label="Pipeline stages"></div>
+    <div class="stage-view rv">
+      <div class="stage-detail">
+        <p class="stage-num" id="stageNum">01 · INGEST</p>
+        <h3 class="stage-title" id="stageTitle">Aggregate</h3>
+        <p class="stage-body" id="stageBody"></p>
+        <p class="stage-guarantee" id="stageGuarantee"></p>
+      </div>
+      <div class="stage-panel" id="stagePanel"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ MODELS ══════════ -->
+<section class="band" id="models">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">The two models</p>
+      <h2 class="statement sm">Different questions need<br>different maths.</h2>
+      <p class="lede">Some contracts have something you can actually track: a price, a level, a date. Others don't. Using one formula for both would be wrong, so we don't.</p>
+    </div>
+    <div class="math-grid">
+      <div class="math-card rv">
+        <div class="math-head"><b>Markets with a number to track</b><span class="tag">e.g. “BTC above $120K”</span></div>
+        <div class="math-body">
+          <p style="margin-bottom:16px">There's a live price, a target, and a deadline. That's the same shape as an option, so we price it like one: how far away the target is, how much the thing moves, and how much time is left.</p>
+          <div class="formula">P(S<sub>T</sub> &gt; K) = N(<span class="v">d₂</span>)<br>d₂ = [ln(S/K) + (μ − σ²/2)T] / σ√T</div>
+          <p class="micro">The Black-Scholes digital formula. N(d₂) is the probability the target is cleared by the deadline.</p>
+        </div>
+      </div>
+      <div class="math-card rv">
+        <div class="math-head"><b>Markets with nothing to track</b><span class="tag">e.g. “Fed cuts in July”</span></div>
+        <div class="math-body">
+          <p style="margin-bottom:16px">There's no price feed for a committee decision. So we start from what the market already believes, and move it only as far as new evidence justifies, the way a forecaster updates a view.</p>
+          <div class="formula">logit(p̂) = <span class="v">a</span> + <span class="v">b</span>·logit(p<sub>mkt</sub>) + <span class="v">k</span>·evidence</div>
+          <p class="micro">Working in log-odds keeps every factor additive, so the pieces sum exactly to the answer.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="math-grid" style="margin-top:16px">
+      <div class="math-card rv">
+        <div class="math-head"><b>Every price adds up</b><span class="tag">EXAMPLE</span></div>
+        <div class="math-body">
+          <div class="attrib">
+            <div class="attrib-row head"><span>What moved it</span><span></span><span class="val">Change</span></div>
+            <div class="attrib-row"><span>Exchange price</span><span class="bar"></span><span class="val dim">58.0¢</span></div>
+            <div class="attrib-row"><span>Crowd bias correction</span><span class="bar"><i style="left:50%;width:6%;background:var(--up)"></i></span><span class="val up">+0.5</span></div>
+            <div class="attrib-row"><span>News</span><span class="bar"><i style="left:50%;width:34%;background:var(--up)"></i></span><span class="val up">+5.6</span></div>
+            <div class="attrib-row"><span>Other exchange disagrees</span><span class="bar"><i style="left:44%;width:6%;background:var(--down)"></i></span><span class="val down">−0.4</span></div>
+            <div class="attrib-row"><span>Vague rules discount</span><span class="bar"><i style="left:41%;width:9%;background:var(--down)"></i></span><span class="val down">−0.6</span></div>
+            <div class="attrib-row total"><span><b>What we think it's worth</b></span><span></span><span class="val accent">63.1¢</span></div>
+          </div>
+          <p class="micro">No unexplained residual. If a number can't be traced to a line in this table, it doesn't ship.</p>
+        </div>
+      </div>
+      <div class="math-card rv">
+        <div class="math-head"><b>When we refuse to answer</b><span class="tag">THE GATE</span></div>
+        <div class="math-body">
+          <p style="margin-bottom:18px">A call only fires when the gap is big enough <em>and</em> we're confident enough. Otherwise the answer is "sit this one out", with the reason attached.</p>
+          <div class="attrib">
+            <div class="attrib-row head"><span>Check</span><span>Needs</span><span class="val">Example</span></div>
+            <div class="attrib-row"><span>Size of the gap</span><span class="mono dim sml">≥ 4 pts</span><span class="val up">+5.1 ✓</span></div>
+            <div class="attrib-row"><span>Confidence</span><span class="mono dim sml">≥ 50%</span><span class="val up">73% ✓</span></div>
+            <div class="attrib-row"><span>Evidence found</span><span class="mono dim sml">≥ 1 source</span><span class="val up">3 ✓</span></div>
+          </div>
+          <p class="micro">Most contracts, most of the time, are priced about right. A tool that always has an opinion isn't a model. On live contracts the gate also needs a model that has beaten the market on held-out data; until one has, every live call is sit this one out.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ WALKTHROUGH · ONE CONTRACT, END TO END ══════════ -->
+<section class="band" id="walkthrough">
+  <div class="wrap narrow">
+    <div class="section-head rv">
+      <p class="kicker">Worked example</p>
+      <h2 class="statement sm">One contract,<br>end to end.</h2>
+      <p class="lede">The stages above are explained one at a time. Here is the contract from the tables, &ldquo;Fed cuts rates&rdquo; trading at 58.0&cent;, walked through the whole pipeline in order: what comes in, what links, what the model does, what the gate says, and how much to risk.</p>
+    </div>
+
+    <div class="wk-frame rv">
+      <div class="wk-head">
+        <b>&ldquo;Fed cuts rates&rdquo; &middot; 58.0&cent; on the exchange</b>
+        <span class="badge-sample">EXAMPLE</span>
+      </div>
+
+      <ol class="wk-steps">
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">01</span>
+          <div class="wk-content">
+            <p class="wk-stage">INGEST</p>
+            <h3 class="wk-title">Pull the market</h3>
+            <p class="wk-why">Both exchanges are polled; this venue prints 58.0&cent;, the other prints a touch lower, and the contract's resolution text comes along with the snapshot.</p>
+            <div class="wk-data">
+              <span class="wk-chip">This exchange <b>58.0&cent;</b></span>
+              <span class="wk-chip">Other venue <b>lower</b></span>
+              <span class="wk-chip">Rules text <b>captured</b></span>
+            </div>
+          </div>
+        </li>
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">02</span>
+          <div class="wk-content">
+            <p class="wk-stage">LINK</p>
+            <h3 class="wk-title">Attach the evidence</h3>
+            <p class="wk-why">Three headlines share enough words and entities with this contract to link to it, each weighted by relevance, source credibility, and recency.</p>
+            <div class="wk-data">
+              <span class="wk-chip">Linked headlines <b>3</b></span>
+              <span class="wk-chip">Older news <b>fades</b></span>
+              <span class="wk-chip">Total nudge <b>capped</b></span>
+            </div>
+          </div>
+        </li>
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">03</span>
+          <div class="wk-content">
+            <p class="wk-stage">PRICE</p>
+            <h3 class="wk-title">Reprice it</h3>
+            <p class="wk-why">A committee decision has no price feed, so the log-odds model starts from the market's 58.0&cent; and moves it exactly as far as the evidence justifies, no further.</p>
+            <div class="attrib wk-attrib">
+              <div class="attrib-row head"><span>What moved it</span><span></span><span class="val">Change</span></div>
+              <div class="attrib-row"><span>Exchange price</span><span></span><span class="val dim">58.0&cent;</span></div>
+              <div class="attrib-row"><span>Crowd bias correction</span><span></span><span class="val up">+0.5</span></div>
+              <div class="attrib-row"><span>News</span><span></span><span class="val up">+5.6</span></div>
+              <div class="attrib-row"><span>Other exchange disagrees</span><span></span><span class="val down">&minus;0.4</span></div>
+              <div class="attrib-row"><span>Vague rules discount</span><span></span><span class="val down">&minus;0.6</span></div>
+              <div class="attrib-row total"><span><b>Fair value</b></span><span></span><span class="val accent">63.1&cent;</span></div>
+            </div>
+            <div class="wk-data">
+              <span class="wk-chip">Model confidence <b>73%</b></span>
+            </div>
+          </div>
+        </li>
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">04</span>
+          <div class="wk-content">
+            <p class="wk-stage">GATE</p>
+            <h3 class="wk-title">Pass the gate</h3>
+            <p class="wk-why">The gap between 63.1 and 58.0 is +5.1 points; that clears the 4 point bar, confidence clears 50%, and evidence exists, so the call fires instead of &ldquo;sit this one out&rdquo;.</p>
+            <div class="wk-data">
+              <span class="wk-chip">Edge &ge; 4 pts <b class="up">+5.1 &#10003;</b></span>
+              <span class="wk-chip">Confidence &ge; 50% <b class="up">73% &#10003;</b></span>
+              <span class="wk-chip">Evidence &ge; 1 source <b class="up">3 &#10003;</b></span>
+            </div>
+          </div>
+        </li>
+
+        <li class="wk-step">
+          <span class="wk-node" aria-hidden="true">05</span>
+          <div class="wk-content">
+            <p class="wk-stage">SIZE</p>
+            <h3 class="wk-title">Size the position</h3>
+            <p class="wk-why">Half of the full Kelly stake for this edge and this confidence works out to 3.5% of bankroll, well under the 15% ceiling.</p>
+            <div class="wk-data">
+              <span class="wk-chip">Half-Kelly stake <b>3.5% of bankroll</b></span>
+              <span class="wk-chip">Hard cap <b>15%</b></span>
+            </div>
+            <div class="wk-verdict">
+              <span class="hcv-tag buy">BUY</span>
+              <span class="wk-note">Fair value 63.1&cent; vs 58.0&cent; market &middot; +5.1 point edge &middot; 73% confidence &middot; 3.5% of bankroll</span>
+            </div>
+          </div>
+        </li>
+
+      </ol>
+
+      <p class="wk-foot">The same steps run on every contract in the terminal, but today no contract gets a call or a stake: sample rows are worked examples and live rows stay on hold until a model beats the market on held-out data. The call and the 3.5% stake above show how the steps would read once one does. <a class="ws-view" data-workspace-view="model" hidden>Open the Model view ↗</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SCENE · EVIDENCE GRAPH ══════════ -->
+<section class="scene" id="evidence" data-scene="graph">
+  <div class="scene-inner">
+    <div class="scene-stage wide">
+      <canvas id="graphCanvas" aria-label="Illustrative evidence graph with example contracts: headlines connecting to the contracts they bear on"></canvas>
+    </div>
+    <div class="scene-copy">
+      <p class="beat" data-beat="0">Every price cites <em>its evidence.</em></p>
+      <p class="beat" data-beat="1">Headlines link to the contracts they bear on.</p>
+      <p class="beat" data-beat="2">No black box. <em>Ever.</em></p>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap narrow">
+    <div class="prose rv">
+      <h2 class="statement sm">How a headline reaches a price</h2>
+      <p>News is matched to contracts by the words and entities they share, not by a language model guessing at relevance. That keeps it reproducible: the same headline and the same contract always produce the same link.</p>
+      <p>Each linked headline becomes a small nudge, weighted by how relevant it is, how credible the source is, and how recent it is. Older news fades. The total nudge is capped, so twenty versions of the same story can't run a price away.</p>
+      <p>If nothing links to a market, it gets <em>no</em> news adjustment, not a guessed one. Staying near the exchange price is the honest default when there's no evidence.</p>
+      <p>Live contracts are stricter still. The tone of a generic headline is not the direction of a particular contract, so on live contracts linked headlines are shown for context and carry zero weight. News moves a live price only once contract-specific evidence has been validated against outcomes. <a class="ws-view" data-workspace-view="evidence" hidden>Open the Evidence view ↗</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ RESOLUTION RISK ══════════ -->
+<section class="band" id="risk">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">Resolution risk</p>
+      <h2 class="statement sm">Right call. Wrong payout.</h2>
+      <p class="lede">Contracts settle on their written rules, not on what everyone agrees happened. When those rules are vague, you can be correct and still not get paid, so we price that risk instead of ignoring it.</p>
+    </div>
+    <div class="cards3">
+      <div class="card rv"><div class="ico">⌗</div><h3>We read the rules</h3><p>On curated contracts, resolution text is scanned for weasel words, undefined terms and missing sources of truth, and each gets a vagueness score. Live contracts are not scored yet, and the terminal says so instead of assuming a default.</p></div>
+      <div class="card rv"><div class="ico">↘</div><h3>Vague rules pull toward 50/50</h3><p>The vaguer the rules, the closer we push our estimate to a coin flip, and the lower our stated confidence.</p></div>
+      <div class="card rv"><div class="ico">⚑</div><h3>Flagged before you size</h3><p>Markets where the payout could contradict a correct call are surfaced before you decide how much to risk, not after settlement.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CALIBRATION ══════════
+     No results are shown because no model has beaten the market on held-out
+     data yet. Where a Resolv server reports a promoted model, script.js swaps
+     the [data-if-no-model] lede for the [data-if-model] one. Gate values
+     mirror MLModel/resolv_ml/config.py (GATE_MIN_EVENTS, GATE_MIN_RESOLUTION_DAYS, PROMOTION_MARGIN, BOOTSTRAP_RESAMPLES,
+     BOOTSTRAP_LOWER_Q, DEMOTE_MIN_SCORED); keep them in sync. -->
+<section class="band" id="calibration">
+  <div class="wrap">
+    <div class="section-head rv">
+      <p class="kicker">Calibration</p>
+      <h2 class="statement sm">How we check ourselves.</h2>
+      <p class="lede">The bar is not a coin flip. It is the exchange's own price, which already carries everything the crowd knows. A model earns a place in Resolv only by beating that price on contracts it has never seen. <span data-if-no-model>As of October 9, 2026, none has, so live contracts show the market price and every live call stays on hold.</span><span data-if-model hidden>This server reports a model that has (status below). Its forecasts are shown for reference only, and every live call stays on hold until its forward record is long enough to judge.</span></p>
+    </div>
+    <div class="proof-grid">
+      <div class="proof-chart rv">
+        <div class="pc-head">
+          <b>Forecast vs what actually happened</b>
+          <span class="badge-sample">ILLUSTRATIVE</span>
+        </div>
+        <canvas id="calChart" aria-label="Illustrative calibration chart, not results: the diagonal is perfect calibration, and a flatter curve shows what an overconfident forecaster looks like"></canvas>
+        <p class="pc-note">Not results. A forecaster on the diagonal is well calibrated. The curve shows the usual failure: bold calls that come true less often than stated. This chart stays illustrative even after a promotion: a model's held-out reliability table is in its training report, and its live record is in the forward ledger.</p>
+      </div>
+      <div class="prose rv">
+        <h3 class="h3">What the scores mean</h3>
+        <p><b>Brier score</b> is the average squared miss between forecast and outcome. Lower is better, and saying 50% on everything scores 0.25.</p>
+        <p><b>Skill</b> is how much lower a model's Brier score is than the market's, on the same contracts at the same moments: 1 &minus; Brier(model) &divide; Brier(market). Zero means it ties the market. Below zero means the exchange price was the better forecast.</p>
+        <p><b>Log loss</b> punishes confident mistakes hardest. Saying 50% on everything scores about 0.69, which is why it is a floor, not a bar.</p>
+        <div class="attrib gates" style="margin-top:20px">
+          <div class="attrib-row head"><span>Promotion gate</span><span class="val">Needs</span></div>
+          <div class="attrib-row"><span>Independent events</span><span class="val">&ge; 50 train &middot; 20 val &middot; 20 test</span></div>
+          <div class="attrib-row"><span>Distinct resolution days</span><span class="val">&ge; 10 in val and in test</span></div>
+          <div class="attrib-row"><span>Validation Brier vs market</span><span class="val">&ge; 0.0015 lower</span></div>
+          <div class="attrib-row"><span>Skill on the untouched test set</span><span class="val">above 0</span></div>
+          <div class="attrib-row"><span>Test skill, lower 5% bound over 1,000 event-clustered resamples</span><span class="val">above 0</span></div>
+          <div class="attrib-row total"><span><b>After promotion: live forward record</b></span><span class="val">demoted if it loses over &ge; 40 scored</span></div>
+        </div>
+        <p class="micro">Status as of October 9, 2026: no model has cleared every gate. Candidates are trained and scored on every run anyway, and their reports are kept whether they pass or fail. When one clears the gate, its held-out and live scores are published here; we'd rather show a modest honest number than a flattering one.</p>
+        <div class="model-live" data-model-status hidden>
+          <span class="ml-pill"><span class="ml-dot"></span><span data-ms-pill>CHECKING</span></span>
+          <span class="ml-text" data-ms-text></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FAQ ══════════ -->
+<section class="band" id="faq">
+  <div class="wrap narrow">
+    <div class="section-head rv">
+      <p class="kicker">FAQ</p>
+      <h2 class="statement sm">Straight answers.</h2>
+    </div>
+    <div class="faq rv">
+      <details open><summary>Is Resolv an exchange?</summary><div class="fa">No. We don't take your money or place your trades. You keep trading wherever you already have an account; Resolv is the analysis you do before you click.</div></details>
+      <details><summary>Aren't prediction markets already efficient?</summary><div class="fa">Mostly, and we behave as if they are: on most contracts our estimate lands within a few points of the exchange and the answer we give is sit this one out. The gaps that do persist come from structure rather than cleverness. Hundreds of contracts are open at once and most have nobody watching them; the same question routinely trades at two different prices on two exchanges; and cheap, unlikely contracts are chronically overbought, which is why a crowd-bias correction is the first thing our model tests. So far no correction has beaten the market price on held-out data, so on live contracts we show the market price and say so. We are not competing with a trading desk on speed. We are covering ground that nobody has time to cover.</div></details>
+      <details><summary>How is a live contract priced if no model has been promoted?</summary><div class="fa">With arithmetic instead of a forecast. Exchanges list many contracts on one question: the same number against several thresholds, or a set of ranges. Those prices have to obey rules. A harder threshold can never be worth more than an easier one, and outcomes that exclude each other can never add up to more than 100 cents. We take every quote in the family, weight each by how tight its order book is, and find the nearest set of prices that obeys the rules. That is the contract's coherent value. We then compare it with the price you could actually trade at, after the fee, and say whether the contract looks cheap, rich or in line against its own family. It makes no claim about the outcome, it never produces a call, and most of the time the honest answer is in line.</div></details>
+      <details><summary>Is any of this financial advice?</summary><div class="fa">No. Resolv is an analytics tool, not a broker, an exchange, or an investment adviser. Everything it publishes is general information from a documented model over public data, identical for every subscriber and tailored to nobody. The position figure is a ceiling produced by a fixed formula from the size of the gap and our confidence, not a recommendation, and it knows nothing about your finances or your goals. It is a limit to stay under, not a target to hit, and the decision to trade is entirely yours.</div></details>
+      <details><summary>Where does the data come from?</summary><div class="fa">Public feeds from the exchanges themselves, plus public news. Every figure carries its source and a timestamp. When a source is unreachable the page says so, and anything older than the latest fetch is labelled with its age instead of passing as live.</div></details>
+      <details><summary>Are these predictions?</summary><div class="fa">They're estimates with stated confidence, built from things we can point at: the exchange price, the news, how liquid the market is, how long is left, whether the two exchanges disagree, and how clear the rules are. Not guarantees, and not financial advice.</div></details>
+      <details><summary>Why should I trust a model I can't see?</summary><div class="fa">You can see it. Every price breaks into named parts that add up exactly to the result, every claim links to its source, and we score ourselves against the market on data the model never trained on, then publish the answer even when it is "not yet". If a number can't be traced, it doesn't ship.</div></details>
+      <details><summary>What happens after the free trial?</summary><div class="fa">You pick a plan or you don't; nothing charges automatically, because we don't take a card to start. If you stop, your watchlist and settings stay put in case you come back.</div></details>
+    </div>
+    <div class="doc-cta rv">
+      <h3>That's the whole method.</h3>
+      <p>See it against live markets, 14 days free, when signups open.</p>
+      <a class="btn primary lg" href="index.html#access">Start free</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot-inner rv">
+    <div class="foot-brand">
+      <span class="logo">resolv<span class="logo-dot"></span></span>
+      <div class="foot-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#pricing">Pricing</a>
+        <a href="index.html#access">Start free</a>
+      </div>
+    </div>
+    <p class="foot-legal">Resolv is an analytics tool. It is not a broker, an exchange, or an investment adviser. Everything here is general information produced by a published model from public data: not personalised advice, not a recommendation to trade, and not a guarantee. Position figures are risk ceilings from a fixed formula, not instructions, and they take no account of your circumstances. You place your own trades and are responsible for them. Event contracts can lose their full value. &copy; <span id="year">2026</span> Resolv</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

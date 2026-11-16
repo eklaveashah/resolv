@@ -1,0 +1,23 @@
+# Security headers for Netlify / Cloudflare Pages (picked up automatically).
+# Other hosts: copy these into your server config (nginx add_header, Apache
+# Header set, or vercel.json "headers"). The CSP here mirrors the <meta> tag
+# in both HTML files; real headers are stronger because they also support
+# frame-ancestors, and they cover every response the host serves.
+#
+# connect-src must stay identical here and in the <meta> CSP of index.html,
+# methodology.html and 404.html. If you set API_ORIGIN in script.js, add that
+# origin to all four, or the browser will block the feed and the signup POST.
+# The script-src hash covers the one-line inline <script> in <head>; if that
+# line ever changes, recompute it (sha256 of the exact bytes between the
+# tags, base64) and update all four.
+
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'sha256-tHd4qJ0R/vQfI0CbRTiL3XGSi+Tun7VhOcDbx08aLKA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.gdeltproject.org; base-uri 'none'; form-action 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
