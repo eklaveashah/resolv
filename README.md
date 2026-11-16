@@ -1,4 +1,4 @@
-> **October 8 update:** See [the connected workspace guide](../WORKSPACE.md) for the new shared local server, live adapters and corrected training workflow. Older setup and model-state notes below describe the original prototype.
+> **October 8 update:** See [the connected workspace guide](../Docs/WORKSPACE.md) for the new shared local server, live adapters and corrected training workflow. Older setup and model-state notes below describe the original prototype.
 
 # Resolv - public website
 
