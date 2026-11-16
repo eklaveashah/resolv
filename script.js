@@ -36,7 +36,7 @@
        straight from the visitor's browser (no market quotes).
    ============================================================= */
 const API_ORIGIN = "";
-const SIGNUP_ENDPOINT = "";
+const SIGNUP_ENDPOINT = "https://formspree.io/f/xqpqpgjn";
 const CONTACT_EMAIL = "";   // TODO founder: set a working address; hello@resolv.trade does not resolve
 const WORKSPACE_MODE = (() => {
   const m = document.querySelector('meta[name="resolv-workspace"]');

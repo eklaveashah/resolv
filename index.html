@@ -7,7 +7,7 @@
      connect-src must stay identical in index.html, methodology.html, 404.html
      and _headers. If you set API_ORIGIN in script.js, add that origin to all
      four, or the browser will block the feed and the signup POST. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-tHd4qJ0R/vQfI0CbRTiL3XGSi+Tun7VhOcDbx08aLKA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.gdeltproject.org; base-uri 'none'; form-action 'self'; object-src 'none'; frame-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-tHd4qJ0R/vQfI0CbRTiL3XGSi+Tun7VhOcDbx08aLKA='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.gdeltproject.org https://formspree.io; base-uri 'none'; form-action 'self'; object-src 'none'; frame-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Resolv · The Intelligence Layer for Prediction Markets</title>
 <meta name="description" content="Resolv puts the news wire, Kalshi and Polymarket on one screen, links each story to the contracts it may touch, and shows where the evidence and the market disagree, or says plainly when it can't tell. 14 days free.">
